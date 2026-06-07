@@ -52,4 +52,36 @@ describe("EntityTrashView", () => {
     render(<EntityTrashView items={active} descriptor={bookDescriptor} />);
     expect(screen.getByText("Trash is empty")).toBeInTheDocument();
   });
+
+  it("applies the default container class when no classNames prop is given", () => {
+    const { container } = render(
+      <EntityTrashView items={books} descriptor={bookDescriptor} />,
+    );
+    expect(container.querySelector(".entity-trash")).toBeInTheDocument();
+  });
+
+  it("applies custom container and forwards list classNames (incl. danger button)", () => {
+    const { container } = render(
+      <EntityTrashView
+        items={books}
+        descriptor={bookDescriptor}
+        classNames={{
+          container: "my-trash",
+          list: {
+            root: "my-list",
+            actionButton: "btn",
+            dangerActionButton: "btn-danger",
+          },
+        }}
+      />,
+    );
+    expect(container.querySelector(".my-trash")).toBeInTheDocument();
+    expect(container.querySelector(".my-list")).toBeInTheDocument();
+    expect(container.querySelector(".entity-trash")).not.toBeInTheDocument();
+    // Restore (default) uses `btn`; permanent delete (danger) uses `btn-danger`.
+    expect(screen.getByText("Restore").closest("button")).toHaveClass("btn");
+    expect(
+      screen.getByText("Delete permanently").closest("button"),
+    ).toHaveClass("btn-danger");
+  });
 });

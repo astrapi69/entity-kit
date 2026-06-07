@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { EmptyStateClassNames } from "../types";
 
 export interface EntityEmptyStateProps {
   /** Primary message. Defaults to a generic "No items" text. */
@@ -9,8 +10,8 @@ export interface EntityEmptyStateProps {
   icon?: ReactNode;
   /** Optional call-to-action element (e.g. a button) shown below the text. */
   action?: ReactNode;
-  /** Extra class names appended to the root element. */
-  className?: string;
+  /** Per-slot class-name overrides. Each slot replaces its semantic default. */
+  classNames?: EmptyStateClassNames;
 }
 
 /**
@@ -22,23 +23,24 @@ export function EntityEmptyState({
   description,
   icon,
   action,
-  className,
+  classNames,
 }: EntityEmptyStateProps): JSX.Element {
   return (
-    <div
-      className={["entity-empty", className].filter(Boolean).join(" ")}
-      role="status"
-    >
+    <div className={classNames?.container ?? "entity-empty"} role="status">
       {icon != null && (
-        <div className="entity-empty__icon" aria-hidden="true">
+        <div className={classNames?.icon ?? "entity-empty__icon"} aria-hidden="true">
           {icon}
         </div>
       )}
-      <p className="entity-empty__title">{title}</p>
+      <p className={classNames?.title ?? "entity-empty__title"}>{title}</p>
       {description != null && (
-        <p className="entity-empty__description">{description}</p>
+        <p className={classNames?.description ?? "entity-empty__description"}>
+          {description}
+        </p>
       )}
-      {action != null && <div className="entity-empty__action">{action}</div>}
+      {action != null && (
+        <div className={classNames?.action ?? "entity-empty__action"}>{action}</div>
+      )}
     </div>
   );
 }

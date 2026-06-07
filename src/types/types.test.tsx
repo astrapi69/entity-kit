@@ -3,6 +3,13 @@ import type {
   ActionDescriptor,
   EntityDescriptor,
   FieldDescriptor,
+  TileClassNames,
+  ListClassNames,
+  DetailClassNames,
+  TrashClassNames,
+  SearchClassNames,
+  ViewSwitcherClassNames,
+  EmptyStateClassNames,
 } from "./index";
 
 interface Book {
@@ -123,5 +130,27 @@ describe("EntityDescriptor", () => {
       actions: [],
     };
     expect(profileDescriptor.entityName).toBe("profile");
+  });
+});
+
+describe("ClassNames interfaces", () => {
+  it("type every documented per-component slot as an optional string", () => {
+    // Compile-time contract: each interface accepts its slots as strings. The
+    // runtime assertions just confirm the objects are usable.
+    const tile: TileClassNames = { grid: "g", tile: "t", title: "ti" };
+    const list: ListClassNames = { root: "r", table: "tb", row: "ro" };
+    const detail: DetailClassNames = { container: "c", label: "l", value: "v" };
+    const trash: TrashClassNames = { container: "c", list: { root: "r" } };
+    const search: SearchClassNames = { container: "c", input: "i" };
+    const switcher: ViewSwitcherClassNames = { group: "g", activeButton: "a" };
+    const empty: EmptyStateClassNames = { container: "c", title: "t" };
+
+    expect(tile.grid).toBe("g");
+    expect(list.root).toBe("r");
+    expect(detail.label).toBe("l");
+    expect(trash.list?.root).toBe("r");
+    expect(search.input).toBe("i");
+    expect(switcher.activeButton).toBe("a");
+    expect(empty.title).toBe("t");
   });
 });

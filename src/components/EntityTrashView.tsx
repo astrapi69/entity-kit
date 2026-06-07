@@ -3,6 +3,7 @@ import type {
   ActionDescriptor,
   EntityDescriptor,
   FieldDescriptor,
+  TrashClassNames,
 } from "../types";
 import { EntityListView } from "./EntityListView";
 import { EntityEmptyState } from "./EntityEmptyState";
@@ -34,8 +35,8 @@ export interface EntityTrashViewProps<T> {
   options?: UseEntityListOptions;
   /** Node rendered when the trash is empty. */
   emptyState?: React.ReactNode;
-  /** Extra class names appended to the root element. */
-  className?: string;
+  /** Per-slot class-name overrides. `list` is forwarded to the inner list view. */
+  classNames?: TrashClassNames;
 }
 
 function formatDeletedAt(value: Date | string | null | undefined): string {
@@ -59,7 +60,7 @@ export function EntityTrashView<T>({
   deletedAtLabel = "Deleted",
   options,
   emptyState,
-  className,
+  classNames,
 }: EntityTrashViewProps<T>): JSX.Element {
   const deletedItems = useMemo(
     () => items.filter((item) => descriptor.isDeleted(item)),
@@ -100,19 +101,20 @@ export function EntityTrashView<T>({
 
   if (deletedItems.length === 0) {
     return (
-      <div className={["entity-trash", className].filter(Boolean).join(" ")}>
+      <div className={classNames?.container ?? "entity-trash"}>
         {emptyState ?? <EntityEmptyState title="Trash is empty" />}
       </div>
     );
   }
 
   return (
-    <div className={["entity-trash", className].filter(Boolean).join(" ")}>
+    <div className={classNames?.container ?? "entity-trash"}>
       <EntityListView
         items={deletedItems}
         descriptor={trashDescriptor}
         onAction={onAction}
         options={options}
+        classNames={classNames?.list}
       />
     </div>
   );

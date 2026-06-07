@@ -53,4 +53,28 @@ describe("EntityDetailView", () => {
     fireEvent.click(screen.getByText("Edit"));
     expect(onAction).toHaveBeenCalledWith("edit", book);
   });
+
+  it("applies semantic default classes when no classNames prop is given", () => {
+    const { container } = render(
+      <EntityDetailView item={book} descriptor={bookDescriptor} />,
+    );
+    expect(container.querySelector(".entity-detail")).toBeInTheDocument();
+    expect(container.querySelector(".entity-detail__label")).toBeInTheDocument();
+    expect(container.querySelector(".entity-detail__value")).toBeInTheDocument();
+  });
+
+  it("applies custom classNames and drops the defaults for overridden slots", () => {
+    const { container } = render(
+      <EntityDetailView
+        item={book}
+        descriptor={bookDescriptor}
+        classNames={{ container: "my-detail", label: "my-label", value: "my-value" }}
+      />,
+    );
+    expect(container.querySelector(".my-detail")).toBeInTheDocument();
+    expect(container.querySelector(".my-label")).toBeInTheDocument();
+    expect(container.querySelector(".my-value")).toBeInTheDocument();
+    expect(container.querySelector(".entity-detail__label")).not.toBeInTheDocument();
+    expect(container.querySelector(".entity-detail__value")).not.toBeInTheDocument();
+  });
 });

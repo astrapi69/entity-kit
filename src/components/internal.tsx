@@ -4,6 +4,11 @@ import type { FieldDescriptor } from "../types";
 /** Callback fired when the user activates an action on an item. */
 export type EntityActionHandler<T> = (actionId: string, item: T) => void;
 
+/** Join truthy class-name parts into a single string (skips undefined/false). */
+export function cx(...parts: Array<string | false | null | undefined>): string {
+  return parts.filter(Boolean).join(" ");
+}
+
 /** Visible fields only — `visible` defaults to true when omitted. */
 export function visibleFields<T>(
   fields: FieldDescriptor<T>[],

@@ -1,4 +1,4 @@
-import type { EntityDescriptor } from "../types";
+import type { EntityDescriptor, TileClassNames } from "../types";
 import { EntityActions } from "./EntityActions";
 import { EntityEmptyState } from "./EntityEmptyState";
 import type { EntityActionHandler } from "./internal";
@@ -12,43 +12,38 @@ export interface EntityTileViewProps<T> {
   onAction?: EntityActionHandler<T>;
   /** Optional click handler for the tile body. */
   onSelect?: (item: T) => void;
-  /** Returns a stable React key for an item. Defaults to the descriptor id. */
-  getKey?: (item: T, index: number) => React.Key;
   /** Node rendered when there are no items. */
   emptyState?: React.ReactNode;
-  /** Extra class names appended to the root element. */
-  className?: string;
+  /** Per-slot class-name overrides. Each slot replaces its semantic default. */
+  classNames?: TileClassNames;
 }
 
 /**
- * Renders a collection of entities as a responsive CSS grid of cards. Each card
+ * Renders a collection of entities as a responsive grid of cards. Each card
  * shows the descriptor's thumbnail, display name, short description and action
- * menu. Layout is a grid; the actual track sizing is delegated to CSS variables.
+ * menu. The grid is a plain element styled by the `grid` slot — with the
+ * default CSS it is a responsive CSS grid; with Tailwind you pass grid classes.
  */
 export function EntityTileView<T>({
   items,
   descriptor,
   onAction,
   onSelect,
-  getKey,
   emptyState,
-  className,
+  classNames,
 }: EntityTileViewProps<T>): JSX.Element {
   if (items.length === 0) {
     return <>{emptyState ?? <EntityEmptyState />}</>;
   }
 
   return (
-    <ul className={["entity-tile", className].filter(Boolean).join(" ")}>
-      {items.map((item, index) => {
+    <ul className={classNames?.grid ?? "entity-tile-grid"}>
+      {items.map((item) => {
         const thumbnail = descriptor.thumbnail?.(item);
         return (
-          <li
-            key={getKey ? getKey(item, index) : descriptor.getId(item)}
-            className="entity-tile__card"
-          >
+          <li key={descriptor.getId(item)} className={classNames?.tile ?? "entity-tile"}>
             <div
-              className="entity-tile__body"
+              className={classNames?.body ?? "entity-tile__body"}
               role={onSelect ? "button" : undefined}
               tabIndex={onSelect ? 0 : undefined}
               onClick={onSelect ? () => onSelect(item) : undefined}
@@ -63,13 +58,20 @@ export function EntityTileView<T>({
                   : undefined
               }
             >
-              <div className="entity-tile__thumbnail" aria-hidden={thumbnail == null}>
+              <div
+                className={classNames?.thumbnail ?? "entity-tile__thumbnail"}
+                aria-hidden={thumbnail == null}
+              >
                 {thumbnail ?? (
-                  <span className="entity-tile__icon">{descriptor.icon}</span>
+                  <span className={classNames?.icon ?? "entity-tile__icon"}>
+                    {descriptor.icon}
+                  </span>
                 )}
               </div>
-              <h3 className="entity-tile__title">{descriptor.displayName(item)}</h3>
-              <p className="entity-tile__description">
+              <h3 className={classNames?.title ?? "entity-tile__title"}>
+                {descriptor.displayName(item)}
+              </h3>
+              <p className={classNames?.subtitle ?? "entity-tile__subtitle"}>
                 {descriptor.shortDescription(item)}
               </p>
             </div>
@@ -77,7 +79,11 @@ export function EntityTileView<T>({
               item={item}
               descriptor={descriptor}
               onAction={onAction}
-              className="entity-tile__actions"
+              classNames={{
+                actions: classNames?.actions ?? "entity-tile__actions",
+                actionButton: classNames?.actionButton,
+                dangerActionButton: classNames?.dangerActionButton,
+              }}
             />
           </li>
         );

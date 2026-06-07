@@ -40,4 +40,29 @@ describe("EntityViewSwitcher", () => {
     expect(screen.getByText("Cards")).toBeInTheDocument();
     expect(screen.queryByText("Detail")).not.toBeInTheDocument();
   });
+
+  it("applies default classes when no classNames prop is given", () => {
+    const { container } = render(
+      <EntityViewSwitcher mode="list" onChange={() => {}} />,
+    );
+    expect(container.querySelector(".entity-switcher")).toBeInTheDocument();
+    expect(container.querySelector(".entity-switcher__button")).toBeInTheDocument();
+  });
+
+  it("applies custom classNames including activeButton on the active toggle", () => {
+    const { container } = render(
+      <EntityViewSwitcher
+        mode="tile"
+        onChange={() => {}}
+        classNames={{ group: "my-group", button: "my-btn", activeButton: "is-active" }}
+      />,
+    );
+    expect(container.querySelector(".my-group")).toBeInTheDocument();
+    expect(container.querySelectorAll(".my-btn")).toHaveLength(3);
+    expect(container.querySelector(".entity-switcher")).not.toBeInTheDocument();
+    // Only the active (tile) button carries the activeButton class.
+    const active = container.querySelectorAll(".is-active");
+    expect(active).toHaveLength(1);
+    expect(active[0]).toHaveAttribute("data-mode", "tile");
+  });
 });

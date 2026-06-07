@@ -1,8 +1,9 @@
 /*
  * entity-tile — responsive card grid rendered by EntityTileView.
+ * Default classes: `entity-tile-grid` (the grid) and `entity-tile` (each card).
  */
 
-.entity-tile {
+.entity-tile-grid {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -14,7 +15,7 @@
   gap: var(--entity-tile-gap, 1rem);
 }
 
-.entity-tile__card {
+.entity-tile {
   display: flex;
   flex-direction: column;
   gap: var(--entity-tile-card-gap, 0.5rem);
@@ -64,12 +65,15 @@
   color: var(--entity-tile-title-color, #1a1a1a);
 }
 
-.entity-tile__description {
+.entity-tile__subtitle {
   margin: 0;
-  font-size: var(--entity-tile-description-size, 0.875rem);
-  color: var(--entity-tile-description-color, #666666);
+  font-size: var(--entity-tile-subtitle-size, 0.875rem);
+  color: var(--entity-tile-subtitle-color, #666666);
 }
 
 .entity-tile__actions {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: var(--entity-actions-gap, 0.375rem);
   margin-top: auto;
 }

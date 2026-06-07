@@ -8,6 +8,18 @@ export type {
   EntityDescriptor,
 } from "./types";
 
+// ClassNames interfaces — one per component, for typed `classNames` props.
+export type {
+  ActionsClassNames,
+  TileClassNames,
+  ListClassNames,
+  DetailClassNames,
+  TrashClassNames,
+  SearchClassNames,
+  ViewSwitcherClassNames,
+  EmptyStateClassNames,
+} from "./types";
+
 // Hooks
 export { useViewMode, useEntitySearch, useEntityList } from "./hooks";
 export type {

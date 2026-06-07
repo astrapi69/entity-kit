@@ -49,4 +49,31 @@ describe("EntityActions", () => {
     );
     expect(container.querySelector(".entity-actions")).not.toBeInTheDocument();
   });
+
+  it("applies default classes when no classNames prop is given", () => {
+    const { container } = render(
+      <EntityActions item={activeBook} descriptor={bookDescriptor} />,
+    );
+    expect(container.querySelector(".entity-actions")).toBeInTheDocument();
+    expect(container.querySelector(".entity-actions__button")).toBeInTheDocument();
+  });
+
+  it("applies custom classNames, using dangerActionButton for danger actions", () => {
+    const { container } = render(
+      <EntityActions
+        item={activeBook}
+        descriptor={bookDescriptor}
+        classNames={{
+          actions: "my-actions",
+          actionButton: "btn",
+          dangerActionButton: "btn-danger",
+        }}
+      />,
+    );
+    expect(container.querySelector(".my-actions")).toBeInTheDocument();
+    expect(container.querySelector(".entity-actions")).not.toBeInTheDocument();
+    // edit = default variant -> btn; delete = danger -> btn-danger
+    expect(screen.getByText("Edit").closest("button")).toHaveClass("btn");
+    expect(screen.getByText("Delete").closest("button")).toHaveClass("btn-danger");
+  });
 });

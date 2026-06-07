@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+import type { ViewSwitcherClassNames } from "../types";
 import type { ViewMode } from "../hooks/useViewMode";
+import { cx } from "./internal";
 
 export interface ViewSwitcherOption {
   /** The view mode this option selects. */
@@ -20,8 +22,8 @@ export interface EntityViewSwitcherProps {
    * text labels.
    */
   options?: ViewSwitcherOption[];
-  /** Extra class names appended to the root element. */
-  className?: string;
+  /** Per-slot class-name overrides. Each slot replaces its semantic default. */
+  classNames?: ViewSwitcherClassNames;
 }
 
 const DEFAULT_OPTIONS: ViewSwitcherOption[] = [
@@ -39,31 +41,34 @@ export function EntityViewSwitcher({
   mode,
   onChange,
   options = DEFAULT_OPTIONS,
-  className,
+  classNames,
 }: EntityViewSwitcherProps): JSX.Element {
+  const buttonClass = classNames?.button ?? "entity-switcher__button";
   return (
-    <div
-      className={["entity-switcher", className].filter(Boolean).join(" ")}
-      role="group"
-    >
+    <div className={classNames?.group ?? "entity-switcher"} role="group">
       {options.map((option) => {
         const active = option.mode === mode;
         return (
           <button
             key={option.mode}
             type="button"
-            className="entity-switcher__button"
+            className={cx(buttonClass, active && classNames?.activeButton)}
             data-mode={option.mode}
             data-active={active || undefined}
             aria-pressed={active}
             onClick={() => onChange(option.mode)}
           >
             {option.icon != null && (
-              <span className="entity-switcher__icon" aria-hidden="true">
+              <span
+                className={classNames?.icon ?? "entity-switcher__icon"}
+                aria-hidden="true"
+              >
                 {option.icon}
               </span>
             )}
-            <span className="entity-switcher__label">{option.label}</span>
+            <span className={classNames?.label ?? "entity-switcher__label"}>
+              {option.label}
+            </span>
           </button>
         );
       })}

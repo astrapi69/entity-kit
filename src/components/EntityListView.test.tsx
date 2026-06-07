@@ -60,4 +60,33 @@ describe("EntityListView", () => {
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(screen.getByText("2 / 2")).toBeInTheDocument();
   });
+
+  it("applies semantic default classes when no classNames prop is given", () => {
+    const { container } = render(
+      <EntityListView items={books} descriptor={bookDescriptor} />,
+    );
+    expect(container.querySelector(".entity-list")).toBeInTheDocument();
+    expect(container.querySelector(".entity-list__table")).toBeInTheDocument();
+    expect(container.querySelector(".entity-list__cell")).toBeInTheDocument();
+  });
+
+  it("applies custom classNames and drops the defaults for overridden slots", () => {
+    const { container } = render(
+      <EntityListView
+        items={books}
+        descriptor={bookDescriptor}
+        classNames={{
+          root: "my-list",
+          table: "my-table",
+          cell: "my-cell",
+          actionsCell: "my-actions-cell",
+        }}
+      />,
+    );
+    expect(container.querySelector(".my-list")).toBeInTheDocument();
+    expect(container.querySelector(".my-table")).toBeInTheDocument();
+    expect(container.querySelector(".my-cell")).toBeInTheDocument();
+    expect(container.querySelector(".entity-list__table")).not.toBeInTheDocument();
+    expect(container.querySelector(".entity-list__cell")).not.toBeInTheDocument();
+  });
 });

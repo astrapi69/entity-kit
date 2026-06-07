@@ -45,4 +45,33 @@ describe("EntityTileView", () => {
     fireEvent.click(screen.getAllByText("Edit")[1]);
     expect(onAction).toHaveBeenCalledWith("edit", books[1]);
   });
+
+  it("applies semantic default classes when no classNames prop is given", () => {
+    const { container } = render(
+      <EntityTileView items={books} descriptor={bookDescriptor} />,
+    );
+    expect(container.querySelector(".entity-tile-grid")).toBeInTheDocument();
+    expect(container.querySelector(".entity-tile")).toBeInTheDocument();
+    expect(container.querySelector(".entity-tile__title")).toBeInTheDocument();
+  });
+
+  it("applies custom classNames and drops the defaults for overridden slots", () => {
+    const { container } = render(
+      <EntityTileView
+        items={books}
+        descriptor={bookDescriptor}
+        classNames={{
+          grid: "my-grid",
+          tile: "my-tile",
+          title: "my-title",
+        }}
+      />,
+    );
+    expect(container.querySelector(".my-grid")).toBeInTheDocument();
+    expect(container.querySelector(".my-tile")).toBeInTheDocument();
+    expect(container.querySelector(".my-title")).toBeInTheDocument();
+    // Overridden defaults must NOT be present.
+    expect(container.querySelector(".entity-tile-grid")).not.toBeInTheDocument();
+    expect(container.querySelector(".entity-tile__title")).not.toBeInTheDocument();
+  });
 });

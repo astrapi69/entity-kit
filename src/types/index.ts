@@ -1,5 +1,16 @@
 import type { ReactNode } from "react";
 
+export type {
+  ActionsClassNames,
+  TileClassNames,
+  ListClassNames,
+  DetailClassNames,
+  TrashClassNames,
+  SearchClassNames,
+  ViewSwitcherClassNames,
+  EmptyStateClassNames,
+} from "./classNames";
+
 /**
  * Visual emphasis for an action. `default` is a neutral action, `danger` marks
  * a destructive action (delete, permanent removal) that consuming apps usually

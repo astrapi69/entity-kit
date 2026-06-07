@@ -1,5 +1,5 @@
 import { flexRender } from "@tanstack/react-table";
-import type { EntityDescriptor } from "../types";
+import type { EntityDescriptor, ListClassNames } from "../types";
 import { useEntityList, type UseEntityListOptions } from "../hooks/useEntityList";
 import { EntityActions } from "./EntityActions";
 import { EntityEmptyState } from "./EntityEmptyState";
@@ -18,8 +18,8 @@ export interface EntityListViewProps<T> {
   showPagination?: boolean;
   /** Node rendered when there are no items. */
   emptyState?: React.ReactNode;
-  /** Extra class names appended to the root element. */
-  className?: string;
+  /** Per-slot class-name overrides. Each slot replaces its semantic default. */
+  classNames?: ListClassNames;
 }
 
 /**
@@ -35,29 +35,37 @@ export function EntityListView<T>({
   options,
   showPagination = true,
   emptyState,
-  className,
+  classNames,
 }: EntityListViewProps<T>): JSX.Element {
   const { table } = useEntityList(items, descriptor, options);
   const rows = table.getRowModel().rows;
   const hasActions = descriptor.actions.length > 0;
+  const actionsClassNames = {
+    actions: classNames?.actions,
+    actionButton: classNames?.actionButton,
+    dangerActionButton: classNames?.dangerActionButton,
+  };
 
   if (items.length === 0) {
     return <>{emptyState ?? <EntityEmptyState />}</>;
   }
 
   return (
-    <div className={["entity-list", className].filter(Boolean).join(" ")}>
-      <table className="entity-list__table">
-        <thead className="entity-list__head">
+    <div className={classNames?.root ?? "entity-list"}>
+      <table className={classNames?.table ?? "entity-list__table"}>
+        <thead className={classNames?.head ?? "entity-list__head"}>
           {table.getHeaderGroups().map((headerGroup) => (
-            <tr key={headerGroup.id} className="entity-list__row">
+            <tr
+              key={headerGroup.id}
+              className={classNames?.headerRow ?? "entity-list__row"}
+            >
               {headerGroup.headers.map((header) => {
                 const canSort = header.column.getCanSort();
                 const sorted = header.column.getIsSorted();
                 return (
                   <th
                     key={header.id}
-                    className="entity-list__header"
+                    className={classNames?.header ?? "entity-list__header"}
                     data-sortable={canSort}
                     data-sorted={sorted || undefined}
                     aria-sort={
@@ -71,7 +79,7 @@ export function EntityListView<T>({
                     {canSort ? (
                       <button
                         type="button"
-                        className="entity-list__sort"
+                        className={classNames?.sortButton ?? "entity-list__sort"}
                         onClick={header.column.getToggleSortingHandler()}
                       >
                         {flexRender(
@@ -99,27 +107,41 @@ export function EntityListView<T>({
                 );
               })}
               {hasActions && (
-                <th className="entity-list__header entity-list__header--actions">
+                <th
+                  className={
+                    classNames?.headerActions ??
+                    "entity-list__header entity-list__header--actions"
+                  }
+                >
                   {""}
                 </th>
               )}
             </tr>
           ))}
         </thead>
-        <tbody className="entity-list__body">
+        <tbody className={classNames?.body ?? "entity-list__body"}>
           {rows.map((row) => (
-            <tr key={row.id} className="entity-list__row">
+            <tr key={row.id} className={classNames?.row ?? "entity-list__row"}>
               {row.getVisibleCells().map((cell) => (
-                <td key={cell.id} className="entity-list__cell">
+                <td
+                  key={cell.id}
+                  className={classNames?.cell ?? "entity-list__cell"}
+                >
                   {flexRender(cell.column.columnDef.cell, cell.getContext())}
                 </td>
               ))}
               {hasActions && (
-                <td className="entity-list__cell entity-list__cell--actions">
+                <td
+                  className={
+                    classNames?.actionsCell ??
+                    "entity-list__cell entity-list__cell--actions"
+                  }
+                >
                   <EntityActions
                     item={row.original}
                     descriptor={descriptor}
                     onAction={onAction}
+                    classNames={actionsClassNames}
                   />
                 </td>
               )}
@@ -129,23 +151,23 @@ export function EntityListView<T>({
       </table>
 
       {showPagination && table.getPageCount() > 1 && (
-        <div className="entity-list__pagination">
+        <div className={classNames?.pagination ?? "entity-list__pagination"}>
           <button
             type="button"
-            className="entity-list__page-button"
+            className={classNames?.pageButton ?? "entity-list__page-button"}
             onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
           >
             {"Previous"}
           </button>
-          <span className="entity-list__page-status">
+          <span className={classNames?.pageStatus ?? "entity-list__page-status"}>
             {table.getState().pagination.pageIndex + 1}
             {" / "}
             {table.getPageCount()}
           </span>
           <button
             type="button"
-            className="entity-list__page-button"
+            className={classNames?.pageButton ?? "entity-list__page-button"}
             onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
           >

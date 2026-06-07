@@ -28,4 +28,17 @@ describe("EntityEmptyState", () => {
     expect(container.querySelector(".entity-empty")).toBeInTheDocument();
     expect(screen.getByRole("status")).toBeInTheDocument();
   });
+
+  it("applies custom classNames and drops the defaults for overridden slots", () => {
+    const { container } = render(
+      <EntityEmptyState
+        title="Empty"
+        classNames={{ container: "my-empty", title: "my-title" }}
+      />,
+    );
+    expect(container.querySelector(".my-empty")).toBeInTheDocument();
+    expect(container.querySelector(".my-title")).toBeInTheDocument();
+    expect(container.querySelector(".entity-empty")).not.toBeInTheDocument();
+    expect(container.querySelector(".entity-empty__title")).not.toBeInTheDocument();
+  });
 });
