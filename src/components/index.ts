@@ -20,6 +20,9 @@ export {
 } from "./EntityTrashView";
 export type { EntityTrashViewProps } from "./EntityTrashView";
 
+export { EntitySearchBar } from "./EntitySearchBar";
+export type { EntitySearchBarProps } from "./EntitySearchBar";
+
 export { EntityViewSwitcher } from "./EntityViewSwitcher";
 export type {
   EntityViewSwitcherProps,

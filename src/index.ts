@@ -37,6 +37,7 @@ export {
   EntityTileView,
   EntityDetailView,
   EntityTrashView,
+  EntitySearchBar,
   EntityViewSwitcher,
   RESTORE_ACTION_ID,
   PERMANENT_DELETE_ACTION_ID,
@@ -49,6 +50,7 @@ export type {
   EntityTileViewProps,
   EntityDetailViewProps,
   EntityTrashViewProps,
+  EntitySearchBarProps,
   EntityViewSwitcherProps,
   ViewSwitcherOption,
 } from "./components";
