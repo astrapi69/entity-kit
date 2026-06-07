@@ -1,0 +1,97 @@
+/*
+ * entity-list — table/row layout rendered by EntityListView.
+ * Every visual property is driven by a CSS custom property with a sensible
+ * fallback, so consuming apps theme it by setting --entity-list-* tokens.
+ */
+
+.entity-list {
+  width: 100%;
+  color: var(--entity-list-color, #1a1a1a);
+  font-family: var(--entity-font-family, system-ui, sans-serif);
+  font-size: var(--entity-list-font-size, 0.9375rem);
+}
+
+.entity-list__table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--entity-list-bg, #ffffff);
+}
+
+.entity-list__head {
+  background: var(--entity-list-head-bg, #f5f5f5);
+}
+
+.entity-list__header {
+  text-align: var(--entity-list-header-align, left);
+  font-weight: var(--entity-list-header-weight, 600);
+  color: var(--entity-list-header-color, #444444);
+  padding: var(--entity-list-cell-padding, 0.5rem 0.75rem);
+  border-bottom: var(--entity-list-border, 1px solid #e0e0e0);
+}
+
+.entity-list__header--actions {
+  width: var(--entity-list-actions-width, 1%);
+}
+
+.entity-list__sort {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--entity-list-sort-gap, 0.25rem);
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+}
+
+.entity-list__sort-indicator {
+  color: var(--entity-list-sort-indicator-color, #888888);
+}
+
+.entity-list__row {
+  border-bottom: var(--entity-list-row-border, 1px solid #eeeeee);
+}
+
+.entity-list__body .entity-list__row:hover {
+  background: var(--entity-list-row-hover-bg, #fafafa);
+}
+
+.entity-list__cell {
+  padding: var(--entity-list-cell-padding, 0.5rem 0.75rem);
+  vertical-align: var(--entity-list-cell-valign, middle);
+}
+
+.entity-list__cell--actions {
+  text-align: var(--entity-list-actions-align, right);
+  white-space: nowrap;
+}
+
+.entity-list__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: var(--entity-list-pagination-justify, flex-end);
+  gap: var(--entity-list-pagination-gap, 0.75rem);
+  padding: var(--entity-list-pagination-padding, 0.5rem 0.75rem);
+}
+
+.entity-list__page-button {
+  padding: var(--entity-list-page-button-padding, 0.25rem 0.625rem);
+  background: var(--entity-list-page-button-bg, #ffffff);
+  color: var(--entity-list-page-button-color, #1a1a1a);
+  border: var(--entity-list-page-button-border, 1px solid #d0d0d0);
+  border-radius: var(--entity-radius, 0.375rem);
+  cursor: pointer;
+  font: inherit;
+}
+
+.entity-list__page-button:disabled {
+  opacity: var(--entity-disabled-opacity, 0.5);
+  cursor: not-allowed;
+}
+
+.entity-list__page-status {
+  color: var(--entity-list-page-status-color, #666666);
+  font-size: var(--entity-list-page-status-size, 0.875rem);
+}

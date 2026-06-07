@@ -1,0 +1,48 @@
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import { EntityTileView } from "./EntityTileView";
+import { bookDescriptor, books } from "../test/fixtures";
+
+describe("EntityTileView", () => {
+  it("renders a card per item with title and description", () => {
+    render(<EntityTileView items={books} descriptor={bookDescriptor} />);
+    expect(screen.getByText("Dune")).toBeInTheDocument();
+    expect(screen.getByText("by Herbert (1965)")).toBeInTheDocument();
+  });
+
+  it("renders the descriptor thumbnail", () => {
+    render(<EntityTileView items={books} descriptor={bookDescriptor} />);
+    expect(screen.getByAltText("Dune")).toBeInTheDocument();
+  });
+
+  it("renders the empty state when there are no items", () => {
+    render(<EntityTileView items={[]} descriptor={bookDescriptor} />);
+    expect(screen.getByText("No items")).toBeInTheDocument();
+  });
+
+  it("calls onSelect when a tile body is clicked", () => {
+    const onSelect = vi.fn();
+    render(
+      <EntityTileView
+        items={books}
+        descriptor={bookDescriptor}
+        onSelect={onSelect}
+      />,
+    );
+    fireEvent.click(screen.getByText("Dune"));
+    expect(onSelect).toHaveBeenCalledWith(books[0]);
+  });
+
+  it("renders an action menu per card", () => {
+    const onAction = vi.fn();
+    render(
+      <EntityTileView
+        items={books}
+        descriptor={bookDescriptor}
+        onAction={onAction}
+      />,
+    );
+    fireEvent.click(screen.getAllByText("Edit")[1]);
+    expect(onAction).toHaveBeenCalledWith("edit", books[1]);
+  });
+});

@@ -1,0 +1,82 @@
+/*
+ * entity-search — styling for a search input and the view switcher / empty
+ * state shared across views.
+ */
+
+.entity-search {
+  display: flex;
+  align-items: center;
+  gap: var(--entity-search-gap, 0.5rem);
+}
+
+.entity-search__input {
+  width: 100%;
+  padding: var(--entity-search-padding, 0.375rem 0.625rem);
+  font: inherit;
+  color: var(--entity-search-color, #1a1a1a);
+  background: var(--entity-search-bg, #ffffff);
+  border: var(--entity-search-border, 1px solid #d0d0d0);
+  border-radius: var(--entity-radius, 0.375rem);
+}
+
+.entity-search__input::placeholder {
+  color: var(--entity-search-placeholder-color, #999999);
+}
+
+/* View switcher toggle group. */
+.entity-switcher {
+  display: inline-flex;
+  gap: var(--entity-switcher-gap, 0.25rem);
+  padding: var(--entity-switcher-padding, 0.25rem);
+  background: var(--entity-switcher-bg, #f0f0f0);
+  border-radius: var(--entity-radius, 0.375rem);
+}
+
+.entity-switcher__button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--entity-switcher-icon-gap, 0.25rem);
+  padding: var(--entity-switcher-button-padding, 0.25rem 0.625rem);
+  font: inherit;
+  font-size: var(--entity-switcher-font-size, 0.875rem);
+  color: var(--entity-switcher-color, #555555);
+  background: var(--entity-switcher-button-bg, transparent);
+  border: none;
+  border-radius: var(--entity-radius, 0.375rem);
+  cursor: pointer;
+}
+
+.entity-switcher__button[data-active] {
+  color: var(--entity-switcher-active-color, #1a1a1a);
+  background: var(--entity-switcher-active-bg, #ffffff);
+  box-shadow: var(--entity-switcher-active-shadow, 0 1px 2px rgba(0, 0, 0, 0.1));
+}
+
+/* Empty-state placeholder. */
+.entity-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--entity-empty-gap, 0.5rem);
+  padding: var(--entity-empty-padding, 2.5rem 1rem);
+  text-align: center;
+  color: var(--entity-empty-color, #888888);
+  font-family: var(--entity-font-family, system-ui, sans-serif);
+}
+
+.entity-empty__icon {
+  font-size: var(--entity-empty-icon-size, 2.5rem);
+  opacity: var(--entity-empty-icon-opacity, 0.6);
+}
+
+.entity-empty__title {
+  margin: 0;
+  font-size: var(--entity-empty-title-size, 1rem);
+  font-weight: var(--entity-empty-title-weight, 600);
+  color: var(--entity-empty-title-color, #555555);
+}
+
+.entity-empty__description {
+  margin: 0;
+  font-size: var(--entity-empty-description-size, 0.875rem);
+}
