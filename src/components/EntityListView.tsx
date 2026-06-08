@@ -36,7 +36,7 @@ export function EntityListView<T>({
   showPagination = true,
   emptyState,
   classNames,
-}: EntityListViewProps<T>): JSX.Element {
+}: EntityListViewProps<T>): React.JSX.Element {
   const { table } = useEntityList(items, descriptor, options);
   const rows = table.getRowModel().rows;
   const hasActions = descriptor.actions.length > 0;

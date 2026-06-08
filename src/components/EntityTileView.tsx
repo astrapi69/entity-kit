@@ -31,7 +31,7 @@ export function EntityTileView<T>({
   onSelect,
   emptyState,
   classNames,
-}: EntityTileViewProps<T>): JSX.Element {
+}: EntityTileViewProps<T>): React.JSX.Element {
   if (items.length === 0) {
     return <>{emptyState ?? <EntityEmptyState />}</>;
   }

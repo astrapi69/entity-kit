@@ -45,7 +45,7 @@ export function EntitySearchBar<T>({
   icon,
   showClear = true,
   classNames,
-}: EntitySearchBarProps<T>): JSX.Element {
+}: EntitySearchBarProps<T>): React.JSX.Element {
   const [internalQuery, setInternalQuery] = useState(defaultQuery);
   const isControlled = query !== undefined;
   const value = isControlled ? query : internalQuery;

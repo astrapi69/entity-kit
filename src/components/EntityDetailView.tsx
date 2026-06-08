@@ -27,7 +27,7 @@ export function EntityDetailView<T>({
   onAction,
   showHeader = true,
   classNames,
-}: EntityDetailViewProps<T>): JSX.Element {
+}: EntityDetailViewProps<T>): React.JSX.Element {
   const fields = visibleFields(descriptor.detailFields);
 
   return (

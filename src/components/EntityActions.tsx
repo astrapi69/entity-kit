@@ -22,7 +22,7 @@ export function EntityActions<T>({
   descriptor,
   onAction,
   classNames,
-}: EntityActionsProps<T>): JSX.Element | null {
+}: EntityActionsProps<T>): React.JSX.Element | null {
   const available = descriptor.actions.filter(
     (action) => action.isAvailable?.(item) ?? true,
   );

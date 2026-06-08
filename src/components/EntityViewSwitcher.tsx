@@ -42,7 +42,7 @@ export function EntityViewSwitcher({
   onChange,
   options = DEFAULT_OPTIONS,
   classNames,
-}: EntityViewSwitcherProps): JSX.Element {
+}: EntityViewSwitcherProps): React.JSX.Element {
   const buttonClass = classNames?.button ?? "entity-switcher__button";
   return (
     <div className={classNames?.group ?? "entity-switcher"} role="group">

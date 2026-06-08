@@ -61,7 +61,7 @@ export function EntityTrashView<T>({
   options,
   emptyState,
   classNames,
-}: EntityTrashViewProps<T>): JSX.Element {
+}: EntityTrashViewProps<T>): React.JSX.Element {
   const deletedItems = useMemo(
     () => items.filter((item) => descriptor.isDeleted(item)),
     [items, descriptor],

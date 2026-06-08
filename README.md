@@ -42,9 +42,9 @@ npm install react react-dom @tanstack/react-table
 
 | Peer                    | Version |
 | ----------------------- | ------- |
-| `react`                 | `^18`   |
-| `react-dom`             | `^18`   |
-| `@tanstack/react-table` | `^8`    |
+| `react`                 | `^18 \|\| ^19` |
+| `react-dom`             | `^18 \|\| ^19` |
+| `@tanstack/react-table` | `^8`           |
 
 ## Quick example
 

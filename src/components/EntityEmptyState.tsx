@@ -24,7 +24,7 @@ export function EntityEmptyState({
   icon,
   action,
   classNames,
-}: EntityEmptyStateProps): JSX.Element {
+}: EntityEmptyStateProps): React.JSX.Element {
   return (
     <div className={classNames?.container ?? "entity-empty"} role="status">
       {icon != null && (
