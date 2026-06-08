@@ -90,4 +90,9 @@ describe("EntitySearchBar", () => {
     expect(container.querySelector(".entity-search")).not.toBeInTheDocument();
     expect(container.querySelector(".entity-search__input")).not.toBeInTheDocument();
   });
+
+  it("sets a data-testid on the input from the entity name", () => {
+    render(<EntitySearchBar items={books} descriptor={bookDescriptor} />);
+    expect(screen.getByTestId("book-search")).toBeInTheDocument();
+  });
 });

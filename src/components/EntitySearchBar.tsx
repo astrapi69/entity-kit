@@ -80,6 +80,7 @@ export function EntitySearchBar<T>({
         value={value}
         placeholder={placeholder}
         aria-label={ariaLabel}
+        data-testid={`${descriptor.entityName}-search`}
         onChange={(event) => update(event.target.value)}
       />
       {showClear && value !== "" && (

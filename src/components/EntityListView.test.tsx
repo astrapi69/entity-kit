@@ -98,4 +98,10 @@ describe("EntityListView", () => {
     render(<EntityListView items={books} descriptor={i18nDescriptor} />);
     expect(screen.getByText("Tytuł")).toBeInTheDocument();
   });
+
+  it("sets a data-testid on each row from entityName and getId", () => {
+    render(<EntityListView items={books} descriptor={bookDescriptor} />);
+    expect(screen.getByTestId("book-1")).toBeInTheDocument();
+    expect(screen.getByTestId("book-2")).toBeInTheDocument();
+  });
 });

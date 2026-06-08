@@ -41,7 +41,11 @@ export function EntityTileView<T>({
       {items.map((item) => {
         const thumbnail = descriptor.thumbnail?.(item);
         return (
-          <li key={descriptor.getId(item)} className={classNames?.tile ?? "entity-tile"}>
+          <li
+            key={descriptor.getId(item)}
+            className={classNames?.tile ?? "entity-tile"}
+            data-testid={`${descriptor.entityName}-${descriptor.getId(item)}`}
+          >
             <div
               className={classNames?.body ?? "entity-tile__body"}
               role={onSelect ? "button" : undefined}

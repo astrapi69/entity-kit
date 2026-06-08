@@ -85,4 +85,10 @@ describe("EntityActions", () => {
     render(<EntityActions item={activeBook} descriptor={i18nDescriptor} />);
     expect(screen.getByText("Edytuj")).toBeInTheDocument();
   });
+
+  it("sets a data-testid on each button from entityName, getId and action id", () => {
+    render(<EntityActions item={activeBook} descriptor={bookDescriptor} />);
+    expect(screen.getByTestId("book-1-edit")).toBeInTheDocument();
+    expect(screen.getByTestId("book-1-delete")).toBeInTheDocument();
+  });
 });

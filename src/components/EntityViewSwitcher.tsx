@@ -54,6 +54,7 @@ export function EntityViewSwitcher({
             type="button"
             className={cx(buttonClass, active && classNames?.activeButton)}
             data-mode={option.mode}
+            data-testid={`view-${option.mode}`}
             data-active={active || undefined}
             aria-pressed={active}
             onClick={() => onChange(option.mode)}

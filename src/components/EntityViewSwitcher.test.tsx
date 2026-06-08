@@ -65,4 +65,11 @@ describe("EntityViewSwitcher", () => {
     expect(active).toHaveLength(1);
     expect(active[0]).toHaveAttribute("data-mode", "tile");
   });
+
+  it("sets a data-testid on each toggle from its mode", () => {
+    render(<EntityViewSwitcher mode="list" onChange={() => {}} />);
+    expect(screen.getByTestId("view-list")).toBeInTheDocument();
+    expect(screen.getByTestId("view-tile")).toBeInTheDocument();
+    expect(screen.getByTestId("view-detail")).toBeInTheDocument();
+  });
 });

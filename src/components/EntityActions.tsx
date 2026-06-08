@@ -46,6 +46,7 @@ export function EntityActions<T>({
             className={buttonClass}
             data-action={action.id}
             data-variant={action.variant ?? "default"}
+            data-testid={`${descriptor.entityName}-${descriptor.getId(item)}-${action.id}`}
             onClick={() => onAction?.(action.id, item)}
           >
             {action.icon != null && (

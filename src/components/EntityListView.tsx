@@ -121,7 +121,11 @@ export function EntityListView<T>({
         </thead>
         <tbody className={classNames?.body ?? "entity-list__body"}>
           {rows.map((row) => (
-            <tr key={row.id} className={classNames?.row ?? "entity-list__row"}>
+            <tr
+              key={row.id}
+              className={classNames?.row ?? "entity-list__row"}
+              data-testid={`${descriptor.entityName}-${descriptor.getId(row.original)}`}
+            >
               {row.getVisibleCells().map((cell) => (
                 <td
                   key={cell.id}

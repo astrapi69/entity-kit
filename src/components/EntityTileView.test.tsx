@@ -74,4 +74,10 @@ describe("EntityTileView", () => {
     expect(container.querySelector(".entity-tile-grid")).not.toBeInTheDocument();
     expect(container.querySelector(".entity-tile__title")).not.toBeInTheDocument();
   });
+
+  it("sets a data-testid on each tile from entityName and getId", () => {
+    render(<EntityTileView items={books} descriptor={bookDescriptor} />);
+    expect(screen.getByTestId("book-1")).toBeInTheDocument();
+    expect(screen.getByTestId("book-3")).toBeInTheDocument();
+  });
 });
