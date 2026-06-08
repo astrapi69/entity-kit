@@ -33,7 +33,7 @@ export function useEntitySearch<T>(
     if (needle === "") return items;
 
     return items.filter((item) =>
-      searchableFields.some((field) =>
+      (searchableFields ?? []).some((field) =>
         toSearchString(item[field]).includes(needle),
       ),
     );

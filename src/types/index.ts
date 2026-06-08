@@ -79,22 +79,25 @@ export interface EntityDescriptor<T> {
   getId: (item: T) => string;
   /** Human/i18n display name for a single item (title shown in tiles, details). */
   displayName: (item: T) => string;
-  /** Short one-line summary of an item (tile subtitle, list secondary text). */
-  shortDescription: (item: T) => string;
-  /** Icon representing the entity type as a whole (renderable node). */
-  icon: ReactNode;
-  /** Optional per-item thumbnail (image URL or renderable node). */
-  thumbnail?: (item: T) => ReactNode;
   /** Fields shown as columns in list views. */
   listFields: FieldDescriptor<T>[];
-  /** Fields shown as label/value pairs in the detail view. */
-  detailFields: FieldDescriptor<T>[];
-  /** Property keys that free-text search matches against. */
-  searchableFields: (keyof T)[];
   /** Whether an item is soft-deleted (drives the trash view). */
   isDeleted: (item: T) => boolean;
+
+  // --- Optional. Components apply sensible defaults when these are omitted. ---
+
+  /** Short one-line summary of an item. Defaults to `() => ""`. */
+  shortDescription?: (item: T) => string;
+  /** Icon representing the entity type as a whole (renderable node). */
+  icon?: ReactNode;
+  /** Optional per-item thumbnail (image URL or renderable node). */
+  thumbnail?: (item: T) => ReactNode;
+  /** Fields shown as label/value pairs in the detail view. Defaults to `[]`. */
+  detailFields?: FieldDescriptor<T>[];
+  /** Property keys that free-text search matches against. Defaults to `[]`. */
+  searchableFields?: (keyof T)[];
   /** When the item was soft-deleted, if known. */
   deletedAt?: (item: T) => Date | string | null | undefined;
-  /** Actions offered for items of this entity type. */
-  actions: ActionDescriptor<T>[];
+  /** Actions offered for items of this entity type. Defaults to `[]`. */
+  actions?: ActionDescriptor<T>[];
 }

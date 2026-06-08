@@ -102,7 +102,7 @@ export function useEntityList<T>(
     globalFilterFn: (row, _columnId, filterValue: string) => {
       const needle = String(filterValue).trim().toLowerCase();
       if (needle === "") return true;
-      return searchableFields.some((field) =>
+      return (searchableFields ?? []).some((field) =>
         toSearchString(row.original[field]).includes(needle),
       );
     },

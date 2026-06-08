@@ -100,7 +100,7 @@ describe("EntityDescriptor", () => {
   it("describes an entity through pure functions over T", () => {
     expect(descriptor.entityName).toBe("book");
     expect(descriptor.displayName(sample)).toBe("Dune");
-    expect(descriptor.shortDescription(sample)).toBe("by Herbert");
+    expect(descriptor.shortDescription?.(sample)).toBe("by Herbert");
     expect(descriptor.thumbnail?.(sample)).toBe("/covers/1.jpg");
     expect(descriptor.isDeleted(sample)).toBe(false);
     expect(descriptor.deletedAt?.(sample)).toBeNull();
@@ -108,7 +108,26 @@ describe("EntityDescriptor", () => {
 
   it("exposes searchable fields that are keys of T", () => {
     expect(descriptor.searchableFields).toContain("title");
-    expect(descriptor.searchableFields.every((k) => k in sample || k === "deletedOn")).toBe(true);
+    expect(
+      (descriptor.searchableFields ?? []).every(
+        (k) => k in sample || k === "deletedOn",
+      ),
+    ).toBe(true);
+  });
+
+  it("requires only entityName, displayName, getId, listFields and isDeleted", () => {
+    const minimal: EntityDescriptor<Book> = {
+      entityName: "book",
+      getId: (item) => item.id,
+      displayName: (item) => item.title,
+      listFields: [{ key: "title", label: "Title" }],
+      isDeleted: (item) => item.deleted,
+    };
+    expect(minimal.shortDescription).toBeUndefined();
+    expect(minimal.detailFields).toBeUndefined();
+    expect(minimal.searchableFields).toBeUndefined();
+    expect(minimal.actions).toBeUndefined();
+    expect(minimal.icon).toBeUndefined();
   });
 
   it("is generic over any object shape", () => {

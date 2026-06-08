@@ -48,4 +48,12 @@ describe("useEntitySearch", () => {
     );
     expect(result.current).toHaveLength(0);
   });
+
+  it("treats a descriptor without searchableFields as having nothing to match", () => {
+    const noSearch = { ...bookDescriptor, searchableFields: undefined };
+    const empty = renderHook(() => useEntitySearch(books, noSearch, ""));
+    expect(empty.result.current).toHaveLength(books.length);
+    const queried = renderHook(() => useEntitySearch(books, noSearch, "dune"));
+    expect(queried.result.current).toHaveLength(0);
+  });
 });

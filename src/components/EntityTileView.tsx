@@ -76,7 +76,7 @@ export function EntityTileView<T>({
                 {descriptor.displayName(item)}
               </h3>
               <p className={classNames?.subtitle ?? "entity-tile__subtitle"}>
-                {descriptor.shortDescription(item)}
+                {descriptor.shortDescription?.(item) ?? ""}
               </p>
             </div>
             <EntityActions

@@ -93,7 +93,7 @@ export function EntityTrashView<T>({
     // field key; the custom renderer ignores that value entirely.
     if (descriptor.deletedAt) {
       const anchorKey =
-        descriptor.listFields[0]?.key ?? descriptor.detailFields[0]?.key;
+        descriptor.listFields[0]?.key ?? descriptor.detailFields?.[0]?.key;
       if (anchorKey !== undefined) {
         const readDeletedAt = descriptor.deletedAt;
         listFields.push({

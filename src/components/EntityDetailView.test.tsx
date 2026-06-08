@@ -1,7 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { EntityDetailView } from "./EntityDetailView";
-import { bookDescriptor, books } from "../test/fixtures";
+import { bookDescriptor, books, type Book } from "../test/fixtures";
+import type { EntityDescriptor } from "../types";
 
 describe("EntityDetailView", () => {
   const book = books[0];
@@ -85,5 +86,22 @@ describe("EntityDetailView", () => {
     };
     render(<EntityDetailView item={book} descriptor={i18nDescriptor} />);
     expect(screen.getByText("Tytuł")).toBeInTheDocument();
+  });
+
+  it("works with a minimal descriptor (no detailFields or actions)", () => {
+    const minimal: EntityDescriptor<Book> = {
+      entityName: "book",
+      getId: (b) => b.id,
+      displayName: (b) => b.title,
+      listFields: [{ key: "title", label: "Title" }],
+      isDeleted: (b) => b.deleted,
+    };
+    const { container } = render(
+      <EntityDetailView item={book} descriptor={minimal} />,
+    );
+    expect(screen.getByRole("heading", { name: "Dune" })).toBeInTheDocument();
+    // detailFields defaults to [] -> no field rows; actions [] -> no footer
+    expect(container.querySelector(".entity-detail__field")).not.toBeInTheDocument();
+    expect(container.querySelector(".entity-detail__footer")).not.toBeInTheDocument();
   });
 });

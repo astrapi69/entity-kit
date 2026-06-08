@@ -39,7 +39,7 @@ export function EntityListView<T>({
 }: EntityListViewProps<T>): React.JSX.Element {
   const { table } = useEntityList(items, descriptor, options);
   const rows = table.getRowModel().rows;
-  const hasActions = descriptor.actions.length > 0;
+  const hasActions = (descriptor.actions ?? []).length > 0;
   const actionsClassNames = {
     actions: classNames?.actions,
     actionButton: classNames?.actionButton,

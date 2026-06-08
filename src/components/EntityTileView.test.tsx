@@ -1,7 +1,8 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { EntityTileView } from "./EntityTileView";
-import { bookDescriptor, books } from "../test/fixtures";
+import { bookDescriptor, books, type Book } from "../test/fixtures";
+import type { EntityDescriptor } from "../types";
 
 describe("EntityTileView", () => {
   it("renders a card per item with title and description", () => {
@@ -79,5 +80,21 @@ describe("EntityTileView", () => {
     render(<EntityTileView items={books} descriptor={bookDescriptor} />);
     expect(screen.getByTestId("book-1")).toBeInTheDocument();
     expect(screen.getByTestId("book-3")).toBeInTheDocument();
+  });
+
+  it("works with a minimal descriptor (optional fields omitted)", () => {
+    const minimal: EntityDescriptor<Book> = {
+      entityName: "book",
+      getId: (b) => b.id,
+      displayName: (b) => b.title,
+      listFields: [{ key: "title", label: "Title" }],
+      isDeleted: (b) => b.deleted,
+    };
+    const { container } = render(
+      <EntityTileView items={books} descriptor={minimal} />,
+    );
+    expect(screen.getByText("Dune")).toBeInTheDocument();
+    // actions default to [] -> no action group rendered
+    expect(container.querySelector(".entity-actions")).not.toBeInTheDocument();
   });
 });

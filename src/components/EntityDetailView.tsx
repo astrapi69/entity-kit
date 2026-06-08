@@ -29,7 +29,7 @@ export function EntityDetailView<T>({
   showHeader = true,
   classNames,
 }: EntityDetailViewProps<T>): React.JSX.Element {
-  const fields = visibleFields(descriptor.detailFields);
+  const fields = visibleFields(descriptor.detailFields ?? []);
 
   return (
     <article className={classNames?.container ?? "entity-detail"}>
@@ -43,7 +43,7 @@ export function EntityDetailView<T>({
               {descriptor.displayName(item)}
             </h2>
             <p className={classNames?.subtitle ?? "entity-detail__subtitle"}>
-              {descriptor.shortDescription(item)}
+              {descriptor.shortDescription?.(item) ?? ""}
             </p>
           </div>
         </header>
@@ -65,7 +65,7 @@ export function EntityDetailView<T>({
         ))}
       </dl>
 
-      {descriptor.actions.length > 0 && (
+      {(descriptor.actions ?? []).length > 0 && (
         <footer className={classNames?.footer ?? "entity-detail__footer"}>
           <EntityActions
             item={item}
