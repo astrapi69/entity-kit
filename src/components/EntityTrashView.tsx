@@ -16,10 +16,18 @@ export const RESTORE_ACTION_ID = "restore";
 export const PERMANENT_DELETE_ACTION_ID = "permanentDelete";
 
 export interface EntityTrashViewProps<T> {
-  /** Items to consider. Only soft-deleted ones (per `isDeleted`) are shown. */
+  /**
+   * Items to consider. By default only soft-deleted ones (per `isDeleted`) are
+   * shown; with `prefiltered` they are all shown as-is.
+   */
   items: T[];
   /** Descriptor describing the items. */
   descriptor: EntityDescriptor<T>;
+  /**
+   * When true, `items` are assumed to already be the trashed set (the app
+   * filtered server-side), so the internal `isDeleted` filter is skipped.
+   */
+  prefiltered?: boolean;
   /**
    * Invoked when a trash action is activated. The action id is one of
    * {@link RESTORE_ACTION_ID} or {@link PERMANENT_DELETE_ACTION_ID}.
@@ -55,6 +63,7 @@ export function EntityTrashView<T>({
   items,
   descriptor,
   onAction,
+  prefiltered = false,
   restoreLabel = "Restore",
   permanentDeleteLabel = "Delete permanently",
   deletedAtLabel = "Deleted",
@@ -63,8 +72,8 @@ export function EntityTrashView<T>({
   classNames,
 }: EntityTrashViewProps<T>): React.JSX.Element {
   const deletedItems = useMemo(
-    () => items.filter((item) => descriptor.isDeleted(item)),
-    [items, descriptor],
+    () => (prefiltered ? items : items.filter((item) => descriptor.isDeleted(item))),
+    [items, descriptor, prefiltered],
   );
 
   const trashDescriptor = useMemo<EntityDescriptor<T>>(() => {

@@ -53,6 +53,25 @@ describe("EntityTrashView", () => {
     expect(screen.getByText("Trash is empty")).toBeInTheDocument();
   });
 
+  it("prefiltered: skips the internal isDeleted filter and shows all items", () => {
+    // `books` mixes active and deleted; prefiltered renders them all as-is.
+    render(<EntityTrashView items={books} descriptor={bookDescriptor} prefiltered />);
+    expect(screen.getByText("Dune")).toBeInTheDocument(); // active, normally filtered out
+    expect(screen.getByText("Old Draft")).toBeInTheDocument();
+  });
+
+  it("auto-hides the deletedAt column when the descriptor has no deletedAt", () => {
+    const noDeletedAt = { ...bookDescriptor, deletedAt: undefined };
+    render(
+      <EntityTrashView items={[books[3]]} descriptor={noDeletedAt} prefiltered />,
+    );
+    expect(screen.getByText("Old Draft")).toBeInTheDocument();
+    expect(screen.queryByText("Deleted")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("2026-01-15T10:00:00.000Z"),
+    ).not.toBeInTheDocument();
+  });
+
   it("applies the default container class when no classNames prop is given", () => {
     const { container } = render(
       <EntityTrashView items={books} descriptor={bookDescriptor} />,
