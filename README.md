@@ -505,6 +505,331 @@ styling purely declarative. Expect runtime overhead versus the other options.
 | CSS Modules   | No                     | **Yes**            | `:global([data-theme])` | Zero         | Scoped styling                 |
 | CSS-in-JS     | No                     | **Yes**            | `ThemeProvider`         | Runtime      | Existing CSS-in-JS codebases   |
 
+## Testing guide
+
+The descriptor pattern makes testing unusually clean: the object-to-UI mapping
+is just pure functions, and the components are generic, so each layer is tested
+in isolation. There are three levels — pick the one that matches what you own.
+
+---
+
+### 1. Library-level (inside entity-kit itself)
+
+For contributors. The generic components are tested against a **mock
+descriptor** with minimal fields — no real entity type required. (entity-kit
+ships 85 such tests; this documents the pattern.)
+
+A minimal mock descriptor is enough to exercise any component:
+
+```tsx
+import type { EntityDescriptor } from "@astrapi69/entity-kit";
+
+interface Widget {
+  id: string;
+  name: string;
+  archived: boolean;
+}
+
+const widgets: Widget[] = [
+  { id: "1", name: "Alpha", archived: false },
+  { id: "2", name: "Beta", archived: false },
+];
+
+const widgetDescriptor: EntityDescriptor<Widget> = {
+  entityName: "widget",
+  getId: (w) => w.id,
+  displayName: (w) => w.name,
+  shortDescription: () => "",
+  icon: "🔧",
+  listFields: [{ key: "name", label: "Name" }],
+  detailFields: [{ key: "name", label: "Name" }],
+  searchableFields: ["name"],
+  isDeleted: (w) => w.archived,
+  actions: [{ id: "edit", label: "Edit" }],
+};
+```
+
+```tsx
+import { fireEvent, render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import { EntityTileView } from "@astrapi69/entity-kit";
+
+describe("EntityTileView", () => {
+  it("applies the semantic default classes", () => {
+    const { container } = render(
+      <EntityTileView items={widgets} descriptor={widgetDescriptor} />,
+    );
+    expect(container.querySelector(".entity-tile-grid")).toBeInTheDocument();
+    expect(container.querySelector(".entity-tile__title")).toBeInTheDocument();
+  });
+
+  it("lets custom classNames override the defaults", () => {
+    const { container } = render(
+      <EntityTileView
+        items={widgets}
+        descriptor={widgetDescriptor}
+        classNames={{ grid: "my-grid", title: "my-title" }}
+      />,
+    );
+    expect(container.querySelector(".my-grid")).toBeInTheDocument();
+    // The default it replaced must be gone:
+    expect(container.querySelector(".entity-tile-grid")).not.toBeInTheDocument();
+  });
+
+  it("fires onAction with the action id and item", () => {
+    const onAction = vi.fn();
+    render(
+      <EntityTileView
+        items={widgets}
+        descriptor={widgetDescriptor}
+        onAction={onAction}
+      />,
+    );
+    fireEvent.click(screen.getAllByText("Edit")[0]);
+    expect(onAction).toHaveBeenCalledWith("edit", widgets[0]);
+  });
+
+  it("renders the empty state for an empty items array", () => {
+    render(<EntityTileView items={[]} descriptor={widgetDescriptor} />);
+    expect(screen.getByText("No items")).toBeInTheDocument();
+  });
+});
+```
+
+**Gotcha:** when asserting that a `classNames` slot dropped its default, query
+the exact default class (e.g. `.entity-tile-grid`) — overriding one slot does
+not change the others, so the un-overridden defaults are still present.
+
+---
+
+### 2. Descriptor-level (inside the consuming app)
+
+The highest-value tests you'll write. An `EntityDescriptor` is **pure
+functions** — no React, no DOM, no rendering. Test the object-to-UI mapping
+directly; these run instantly.
+
+```ts
+// descriptors/bookDescriptor.ts
+import type { EntityDescriptor } from "@astrapi69/entity-kit";
+
+export interface Book {
+  id: string;
+  title: string;
+  author: string;
+  year: number;
+  deleted: boolean;
+  deletedOn?: string;
+}
+
+export const bookDescriptor: EntityDescriptor<Book> = {
+  entityName: "book",
+  getId: (b) => b.id,
+  displayName: (b) => b.title,
+  shortDescription: (b) => `by ${b.author} (${b.year})`,
+  icon: "📚",
+  listFields: [
+    { key: "title", label: "Title", sortable: true },
+    { key: "author", label: "Author", sortable: true },
+    { key: "year", label: "Year", sortable: true },
+  ],
+  detailFields: [
+    { key: "title", label: "Title" },
+    { key: "author", label: "Author" },
+    { key: "year", label: "Year" },
+  ],
+  searchableFields: ["title", "author"],
+  isDeleted: (b) => b.deleted,
+  deletedAt: (b) => b.deletedOn ?? null,
+  actions: [
+    { id: "edit", label: "Edit" },
+    { id: "delete", label: "Delete", variant: "danger", isAvailable: (b) => !b.deleted },
+    { id: "restore", label: "Restore", isAvailable: (b) => b.deleted },
+  ],
+};
+```
+
+```ts
+// descriptors/bookDescriptor.test.ts  — no React, no DOM
+import { describe, expect, it } from "vitest";
+import { bookDescriptor, type Book } from "./bookDescriptor";
+
+const active: Book = {
+  id: "1", title: "Dune", author: "Herbert", year: 1965, deleted: false,
+};
+const trashed: Book = {
+  id: "2", title: "Old Draft", author: "Herbert", year: 1960,
+  deleted: true, deletedOn: "2026-01-15T10:00:00.000Z",
+};
+
+describe("bookDescriptor", () => {
+  it("maps an item to its display strings", () => {
+    expect(bookDescriptor.getId(active)).toBe("1");
+    expect(bookDescriptor.displayName(active)).toBe("Dune");
+    expect(bookDescriptor.shortDescription(active)).toBe("by Herbert (1965)");
+  });
+
+  it("detects soft-deleted items", () => {
+    expect(bookDescriptor.isDeleted(active)).toBe(false);
+    expect(bookDescriptor.isDeleted(trashed)).toBe(true);
+    expect(bookDescriptor.deletedAt?.(trashed)).toBe("2026-01-15T10:00:00.000Z");
+    expect(bookDescriptor.deletedAt?.(active)).toBeNull();
+  });
+
+  it("filters actions by availability", () => {
+    const availableIds = (item: Book) =>
+      bookDescriptor.actions
+        .filter((a) => a.isAvailable?.(item) ?? true)
+        .map((a) => a.id);
+
+    expect(availableIds(active)).toEqual(["edit", "delete"]);
+    expect(availableIds(trashed)).toEqual(["edit", "restore"]);
+  });
+
+  it("declares complete list and detail fields", () => {
+    expect(bookDescriptor.listFields.map((f) => f.key)).toEqual([
+      "title", "author", "year",
+    ]);
+    expect(bookDescriptor.detailFields.map((f) => f.key)).toContain("year");
+    expect(bookDescriptor.searchableFields).toEqual(["title", "author"]);
+  });
+});
+```
+
+**Why this matters:** a bug in `displayName`, `getId`, `isDeleted` or an
+action's `isAvailable` is a bug in *every* view at once. Catching it here — with
+zero rendering — is the cheapest test you can write, so write one for every new
+descriptor.
+
+---
+
+### 3. Integration-level (inside the consuming app)
+
+Tests a page/view that composes entity-kit with a descriptor and your app
+logic. Render with mock data, assert items appear, and verify that `onAction`
+triggers the right behaviour (navigation, API calls). **Mock the API client** so
+the view is tested in isolation from the network.
+
+```tsx
+// Dashboard.tsx
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { EntityTileView } from "@astrapi69/entity-kit";
+import { bookApi } from "./api/bookApi";
+import { bookDescriptor, type Book } from "./descriptors/bookDescriptor";
+
+export function Dashboard() {
+  const [books, setBooks] = useState<Book[]>([]);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    bookApi.list().then(setBooks);
+  }, []);
+
+  return (
+    <EntityTileView
+      items={books}
+      descriptor={bookDescriptor}
+      onAction={(action, book) => {
+        if (action === "edit") navigate(`/books/${book.id}/edit`);
+        if (action === "delete") {
+          bookApi.remove(book.id).then(() =>
+            setBooks((prev) => prev.filter((b) => b.id !== book.id)),
+          );
+        }
+      }}
+    />
+  );
+}
+```
+
+```tsx
+// Dashboard.test.tsx
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { Dashboard } from "./Dashboard";
+import { bookApi } from "./api/bookApi";
+
+// Mock the API client — the view is isolated from the network.
+vi.mock("./api/bookApi", () => ({
+  bookApi: { list: vi.fn(), remove: vi.fn() },
+}));
+
+// Mock router navigation so we can assert on it.
+const navigate = vi.fn();
+vi.mock("react-router-dom", () => ({ useNavigate: () => navigate }));
+
+const books = [
+  { id: "1", title: "Dune", author: "Herbert", year: 1965, deleted: false },
+  { id: "2", title: "Neuromancer", author: "Gibson", year: 1984, deleted: false },
+];
+
+beforeEach(() => {
+  vi.mocked(bookApi.list).mockResolvedValue(books);
+  vi.mocked(bookApi.remove).mockResolvedValue(undefined);
+  navigate.mockClear();
+});
+
+describe("Dashboard", () => {
+  it("renders the fetched books as tiles", async () => {
+    render(<Dashboard />);
+    expect(await screen.findByText("Dune")).toBeInTheDocument();
+    expect(screen.getByText("Neuromancer")).toBeInTheDocument();
+  });
+
+  it("navigates to the editor when Edit is activated", async () => {
+    render(<Dashboard />);
+    await screen.findByText("Dune");
+    fireEvent.click(screen.getAllByText("Edit")[0]);
+    expect(navigate).toHaveBeenCalledWith("/books/1/edit");
+  });
+
+  it("calls the API and drops the tile when Delete is activated", async () => {
+    render(<Dashboard />);
+    await screen.findByText("Dune");
+    fireEvent.click(screen.getAllByText("Delete")[0]);
+    expect(bookApi.remove).toHaveBeenCalledWith("1");
+    await waitFor(() =>
+      expect(screen.queryByText("Dune")).not.toBeInTheDocument(),
+    );
+  });
+});
+```
+
+**Caveat:** keep integration tests focused on *composition and wiring* — that
+data flows in and actions flow out. The generic rendering (columns, sorting,
+empty states) is already covered library-side, and the mapping is covered
+descriptor-side; don't re-test those here.
+
+---
+
+### Choosing a level
+
+| Level       | What it tests        | Dependencies            | Speed   | When to write                    |
+| ----------- | -------------------- | ----------------------- | ------- | -------------------------------- |
+| Library     | Generic components   | None (mock data)        | Fast    | When contributing to entity-kit  |
+| Descriptor  | Object-to-UI mapping | None (pure functions)   | Instant | For every new EntityDescriptor   |
+| Integration | Page composition     | entity-kit + descriptor | Medium  | For every page using entity-kit  |
+| E2E         | Full user flow       | Everything (real browser) | Slow  | For critical user journeys       |
+
+### Testing with different CSS frameworks
+
+The `classNames` tests are **framework-agnostic**. They assert that a custom
+class string *replaces* the semantic default for a slot — and that assertion
+holds no matter where the string comes from:
+
+```tsx
+// The same test shape works for any approach:
+classNames={{ grid: "grid grid-cols-3 gap-4" }}   // Tailwind utilities
+classNames={{ grid: styles.grid }}                // CSS Modules (a hashed name)
+classNames={{ grid: "my-grid" }}                  // plain semantic class
+```
+
+Because every slot is just a `string`, a test that checks
+`container.querySelector(".my-grid")` is present and `.entity-tile-grid` is
+absent verifies the override mechanism itself — independent of Tailwind, CSS
+Modules, or any other string-based class system. You never need to run a real
+CSS pipeline to test that your classes are wired through correctly.
+
 ## API reference
 
 ### Types
