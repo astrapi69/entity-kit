@@ -77,4 +77,13 @@ describe("EntityDetailView", () => {
     expect(container.querySelector(".entity-detail__label")).not.toBeInTheDocument();
     expect(container.querySelector(".entity-detail__value")).not.toBeInTheDocument();
   });
+
+  it("resolves a function field label (i18n factory)", () => {
+    const i18nDescriptor = {
+      ...bookDescriptor,
+      detailFields: [{ key: "title" as const, label: () => "Tytuł" }],
+    };
+    render(<EntityDetailView item={book} descriptor={i18nDescriptor} />);
+    expect(screen.getByText("Tytuł")).toBeInTheDocument();
+  });
 });

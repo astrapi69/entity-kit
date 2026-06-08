@@ -89,4 +89,13 @@ describe("EntityListView", () => {
     expect(container.querySelector(".entity-list__table")).not.toBeInTheDocument();
     expect(container.querySelector(".entity-list__cell")).not.toBeInTheDocument();
   });
+
+  it("resolves a function column label (i18n factory)", () => {
+    const i18nDescriptor = {
+      ...bookDescriptor,
+      listFields: [{ key: "title" as const, label: () => "Tytuł", sortable: true }],
+    };
+    render(<EntityListView items={books} descriptor={i18nDescriptor} />);
+    expect(screen.getByText("Tytuł")).toBeInTheDocument();
+  });
 });

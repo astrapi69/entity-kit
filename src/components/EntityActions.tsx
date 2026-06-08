@@ -1,4 +1,5 @@
 import type { ActionsClassNames, EntityDescriptor } from "../types";
+import { resolveLabel } from "../labels";
 import type { EntityActionHandler } from "./internal";
 
 export interface EntityActionsProps<T> {
@@ -56,7 +57,7 @@ export function EntityActions<T>({
               </span>
             )}
             <span className={classNames?.actionLabel ?? "entity-actions__label"}>
-              {action.label}
+              {resolveLabel(action.label)}
             </span>
           </button>
         );

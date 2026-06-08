@@ -76,4 +76,13 @@ describe("EntityActions", () => {
     expect(screen.getByText("Edit").closest("button")).toHaveClass("btn");
     expect(screen.getByText("Delete").closest("button")).toHaveClass("btn-danger");
   });
+
+  it("resolves a function label (i18n factory) at render time", () => {
+    const i18nDescriptor = {
+      ...bookDescriptor,
+      actions: [{ id: "edit", label: () => "Edytuj" }],
+    };
+    render(<EntityActions item={activeBook} descriptor={i18nDescriptor} />);
+    expect(screen.getByText("Edytuj")).toBeInTheDocument();
+  });
 });

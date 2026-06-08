@@ -1,4 +1,5 @@
 import type { DetailClassNames, EntityDescriptor } from "../types";
+import { resolveLabel } from "../labels";
 import { EntityActions } from "./EntityActions";
 import { renderFieldValue, visibleFields } from "./internal";
 import type { EntityActionHandler } from "./internal";
@@ -55,7 +56,7 @@ export function EntityDetailView<T>({
             className={classNames?.field ?? "entity-detail__field"}
           >
             <dt className={classNames?.label ?? "entity-detail__label"}>
-              {field.label}
+              {resolveLabel(field.label)}
             </dt>
             <dd className={classNames?.value ?? "entity-detail__value"}>
               {renderFieldValue(field, item)}

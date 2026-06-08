@@ -10,6 +10,7 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import type { EntityDescriptor, FieldDescriptor } from "../types";
+import { resolveLabel } from "../labels";
 
 export interface UseEntityListOptions {
   /** Rows per page. Defaults to 10. */
@@ -76,7 +77,7 @@ export function useEntityList<T>(
       const column: ColumnDef<T> = {
         id,
         accessorKey: accessor,
-        header: field.label,
+        header: resolveLabel(field.label),
         enableSorting: field.sortable === true,
         // Sort ascending on first click for every column type (TanStack
         // defaults numeric columns to descending-first otherwise).

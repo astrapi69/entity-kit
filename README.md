@@ -130,6 +130,50 @@ function Browser({ books }: { books: Book[] }) {
 }
 ```
 
+## Internationalization (i18n)
+
+Every `label` — on a `FieldDescriptor` or an `ActionDescriptor` — accepts either
+a plain string **or** a factory `() => string`. The factory is resolved at
+render time, so labels follow the active locale and re-render when it changes.
+Wire it to whatever i18n library you use:
+
+```tsx
+import { useTranslation } from "react-i18next";
+import type { EntityDescriptor } from "@astrapi69/entity-kit";
+
+// `t` from i18next, `$t` from vue-i18n-style setups, etc. — any () => string.
+function makeBookDescriptor(t: (key: string) => string): EntityDescriptor<Book> {
+  return {
+    entityName: "book",
+    getId: (b) => b.id,
+    displayName: (b) => b.title,
+    shortDescription: (b) => b.author,
+    icon: <BookIcon />,
+    listFields: [
+      { key: "title", label: () => t("book.title"), sortable: true },
+      { key: "author", label: () => t("book.author") },
+    ],
+    detailFields: [{ key: "title", label: () => t("book.title") }],
+    searchableFields: ["title", "author"],
+    isDeleted: (b) => b.deleted,
+    actions: [
+      { id: "edit", label: () => t("actions.edit") },
+      { id: "delete", label: () => t("actions.delete"), variant: "danger" },
+    ],
+  };
+}
+
+function Library({ books }: { books: Book[] }) {
+  const { t } = useTranslation();
+  // Rebuild when the language changes so the label factories re-resolve.
+  const descriptor = useMemo(() => makeBookDescriptor(t), [t]);
+  return <EntityListView items={books} descriptor={descriptor} />;
+}
+```
+
+Plain strings still work everywhere — use the factory form only for labels you
+translate.
+
 ## Styling guide
 
 This is the heart of the library: **it works with any styling approach without

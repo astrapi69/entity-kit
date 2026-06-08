@@ -27,8 +27,11 @@ export type ActionVariant = "default" | "danger";
 export interface ActionDescriptor<T> {
   /** Stable identifier, unique within a descriptor's `actions`. */
   id: string;
-  /** i18n key or human label for the action. */
-  label: string;
+  /**
+   * Human label for the action. Either a string, or a factory `() => string`
+   * for i18n (resolved at render time so it reacts to locale changes).
+   */
+  label: string | (() => string);
   /** Optional icon (any renderable node, e.g. an SVG or icon component). */
   icon?: ReactNode;
   /** Visual emphasis. Defaults to `default` when omitted. */
@@ -48,8 +51,11 @@ export interface ActionDescriptor<T> {
 export interface FieldDescriptor<T> {
   /** Property key on `T` this field reads from. */
   key: keyof T;
-  /** i18n key or human label for the field/column header. */
-  label: string;
+  /**
+   * Human label for the field/column header. Either a string, or a factory
+   * `() => string` for i18n (resolved at render time).
+   */
+  label: string | (() => string);
   /**
    * Custom renderer for the field value. When omitted, components render the
    * raw value. Receives the whole item so renderers can combine fields.
