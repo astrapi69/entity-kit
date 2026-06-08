@@ -816,27 +816,41 @@ beforeEach(() => {
 describe("Dashboard", () => {
   it("renders the fetched books as tiles", async () => {
     render(<Dashboard />);
-    expect(await screen.findByText("Dune")).toBeInTheDocument();
-    expect(screen.getByText("Neuromancer")).toBeInTheDocument();
+    // Prefer the stable data-testid (entityName-getId) over label text:
+    expect(await screen.findByTestId("book-1")).toBeInTheDocument();
+    expect(screen.getByTestId("book-2")).toBeInTheDocument();
   });
 
   it("navigates to the editor when Edit is activated", async () => {
     render(<Dashboard />);
-    await screen.findByText("Dune");
-    fireEvent.click(screen.getAllByText("Edit")[0]);
+    await screen.findByTestId("book-1");
+    fireEvent.click(screen.getByTestId("book-1-edit"));
     expect(navigate).toHaveBeenCalledWith("/books/1/edit");
   });
 
   it("calls the API and drops the tile when Delete is activated", async () => {
     render(<Dashboard />);
-    await screen.findByText("Dune");
-    fireEvent.click(screen.getAllByText("Delete")[0]);
+    await screen.findByTestId("book-1");
+    fireEvent.click(screen.getByTestId("book-1-delete"));
     expect(bookApi.remove).toHaveBeenCalledWith("1");
     await waitFor(() =>
-      expect(screen.queryByText("Dune")).not.toBeInTheDocument(),
+      expect(screen.queryByTestId("book-1")).not.toBeInTheDocument(),
     );
   });
 });
+```
+
+Every row/tile, action button, search input and view toggle carries a stable
+`data-testid` derived from the descriptor (scheme in
+[Test ids](#test-ids-data-testid)). Selecting by it keeps tests resilient to
+label/i18n/styling changes, and the **same ids power Playwright E2E**:
+
+```ts
+// books.e2e.ts (Playwright)
+await page.getByTestId("book-search").fill("dune");
+await page.getByTestId("book-1").click();
+await page.getByTestId("book-1-delete").click();
+await page.getByTestId("view-tile").click();
 ```
 
 **Caveat:** keep integration tests focused on *composition and wiring* — that
@@ -885,10 +899,39 @@ CSS pipeline to test that your classes are wired through correctly.
 | `ActionDescriptor<T>` | A single action: `id`, `label`, `icon?`, `variant?`, `isAvailable?`.      |
 | `ActionVariant`       | `"default" \| "danger"`.                                                  |
 
-**`EntityDescriptor<T>`** members: `entityName`, `getId(item)`,
-`displayName(item)`, `shortDescription(item)`, `icon`, `thumbnail?(item)`,
-`listFields`, `detailFields`, `searchableFields`, `isDeleted(item)`,
-`deletedAt?(item)`, `actions`.
+`label` (on both `FieldDescriptor` and `ActionDescriptor`) is
+`string | (() => string)` — pass a factory for i18n (see
+[Internationalization](#internationalization-i18n)).
+
+**`EntityDescriptor<T>` members.** Only five are required; the rest are optional
+and default sensibly when omitted:
+
+| Member               | Required? | Default when omitted     |
+| -------------------- | --------- | ------------------------ |
+| `entityName`         | **yes**   | —                        |
+| `getId(item)`        | **yes**   | —                        |
+| `displayName(item)`  | **yes**   | —                        |
+| `listFields`         | **yes**   | —                        |
+| `isDeleted(item)`    | **yes**   | —                        |
+| `shortDescription(item)` | no    | `() => ""`               |
+| `icon`               | no        | nothing rendered         |
+| `thumbnail(item)`    | no        | falls back to `icon`     |
+| `detailFields`       | no        | `[]`                     |
+| `searchableFields`   | no        | `[]`                     |
+| `deletedAt(item)`    | no        | trash hides the column   |
+| `actions`            | no        | `[]`                     |
+
+A minimal descriptor is therefore just the five required members:
+
+```tsx
+const minimalBook: EntityDescriptor<Book> = {
+  entityName: "book",
+  getId: (b) => b.id,
+  displayName: (b) => b.title,
+  listFields: [{ key: "title", label: "Title" }],
+  isDeleted: (b) => b.deleted,
+};
+```
 
 ### ClassNames interfaces
 
@@ -914,7 +957,7 @@ visual slot; an omitted slot falls back to its semantic default class.
 | `EntityListView`     | Sortable, filterable, paginated table from `listFields` (TanStack Table). | `ListClassNames`         |
 | `EntityTileView`     | Responsive grid of cards with thumbnail, name, description, actions.      | `TileClassNames`         |
 | `EntityDetailView`   | Label/value pairs from `detailFields`, honouring custom renderers.        | `DetailClassNames`       |
-| `EntityTrashView`    | `EntityListView` filtered to `isDeleted` items, with restore/delete.      | `TrashClassNames`        |
+| `EntityTrashView`    | `isDeleted` items as a list with restore/delete; `prefiltered` skips the filter. | `TrashClassNames`        |
 | `EntitySearchBar`    | Search input filtering over `searchableFields` via `useEntitySearch`.     | `SearchClassNames`       |
 | `EntityViewSwitcher` | Toggle buttons for list / tile / detail modes.                            | `ViewSwitcherClassNames` |
 | `EntityEmptyState`   | Placeholder for empty collections.                                        | `EmptyStateClassNames`   |
@@ -926,10 +969,31 @@ report user intent through an `onAction(actionId, item)` callback, and accept a
 
 `EntityTrashView` emits the action ids `RESTORE_ACTION_ID` (`"restore"`) and
 `PERMANENT_DELETE_ACTION_ID` (`"permanentDelete"`), both exported as constants.
+Pass **`prefiltered`** when `items` are already the trashed set (filtered
+server-side) to skip the internal `isDeleted` filter; the deletion-timestamp
+column auto-hides when the descriptor has no `deletedAt`:
+
+```tsx
+// `trashedBooks` already came back filtered from the API:
+<EntityTrashView items={trashedBooks} descriptor={bookDescriptor} prefiltered onAction={onAction} />
+```
 
 `EntitySearchBar` works controlled (pass `query`) or uncontrolled, and reports
 the filtered list through `onResults(results)` and text through
 `onQueryChange(query)`.
+
+### Test ids (`data-testid`)
+
+Every interactive element carries a stable `data-testid` derived from the
+descriptor — built from `entityName` and `getId(item)`, so it survives
+label/i18n/styling changes. Ideal for Playwright/Cypress and integration tests:
+
+| Element              | `data-testid`                              |
+| -------------------- | ------------------------------------------ |
+| List row / tile      | `{entityName}-{getId(item)}`               |
+| Action button        | `{entityName}-{getId(item)}-{action.id}`   |
+| Search input         | `{entityName}-search`                      |
+| View switcher toggle | `view-{mode}` (`view-list`, `view-tile`, …) |
 
 ### Hooks
 
@@ -954,6 +1018,30 @@ descriptorRegistry.register(profileDescriptor);
 
 const desc = descriptorRegistry.get<Book>("book");
 ```
+
+## Migrating from 0.1.x
+
+**0.2.0 is fully backwards-compatible — no code changes required.** Every change
+is additive; existing descriptors and components keep working unchanged. What's
+new and opt-in:
+
+- **i18n labels** — `FieldDescriptor.label` / `ActionDescriptor.label` now accept
+  `() => string` in addition to `string`. Existing string labels are untouched.
+  See [Internationalization](#internationalization-i18n).
+- **Optional descriptor fields** — `shortDescription`, `detailFields`,
+  `searchableFields`, `actions` (and `icon`) are now optional with sensible
+  defaults. Descriptors that already set them are unaffected; new ones can omit
+  them. See the [member table](#api-reference).
+- **`prefiltered` on `EntityTrashView`** — opt in when your app already filtered
+  to the trashed set.
+- **`data-testid` attributes** — added to rows, tiles, action buttons, the
+  search input and view toggles. Purely additive; safe to start selecting by
+  them. See [Test ids](#test-ids-data-testid).
+- **`./package.json` export** — added to the package `exports` map for bundlers
+  that resolve it.
+
+Bumping `react` to 19 is also supported (peer range is `^18 || ^19`), but not
+required — 18 keeps working.
 
 ## Design rules
 
