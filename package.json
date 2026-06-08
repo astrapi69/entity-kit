@@ -24,7 +24,8 @@
       "require": "./dist/index.cjs"
     },
     "./styles": "./styles/defaults.css",
-    "./styles/*": "./styles/*"
+    "./styles/*": "./styles/*",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "build": "tsup",
