@@ -1,6 +1,6 @@
 {
   "name": "@astrapi69/entity-kit",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Headless, type-safe React component library implementing the BeanInfo pattern. Any object type describes itself via an EntityDescriptor and generic components render it.",
   "license": "MIT",
   "author": "Asterios Raptis",
