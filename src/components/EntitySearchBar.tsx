@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { generateSearchTestId } from "@astrapi69/entity-kit-core";
 import type { EntityDescriptor, SearchClassNames } from "../types";
 import { useEntitySearch } from "../hooks/useEntitySearch";
 
@@ -80,7 +81,7 @@ export function EntitySearchBar<T>({
         value={value}
         placeholder={placeholder}
         aria-label={ariaLabel}
-        data-testid={`${descriptor.entityName}-search`}
+        data-testid={generateSearchTestId(descriptor.entityName)}
         onChange={(event) => update(event.target.value)}
       />
       {showClear && value !== "" && (

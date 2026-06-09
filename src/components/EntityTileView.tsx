@@ -1,3 +1,4 @@
+import { generateTestId } from "@astrapi69/entity-kit-core";
 import type { EntityDescriptor, TileClassNames } from "../types";
 import { EntityActions } from "./EntityActions";
 import { EntityEmptyState } from "./EntityEmptyState";
@@ -44,7 +45,10 @@ export function EntityTileView<T>({
           <li
             key={descriptor.getId(item)}
             className={classNames?.tile ?? "entity-tile"}
-            data-testid={`${descriptor.entityName}-${descriptor.getId(item)}`}
+            data-testid={generateTestId(
+              descriptor.entityName,
+              descriptor.getId(item),
+            )}
           >
             <div
               className={classNames?.body ?? "entity-tile__body"}

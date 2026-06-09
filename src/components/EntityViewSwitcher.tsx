@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { generateViewTestId } from "@astrapi69/entity-kit-core";
 import type { ViewSwitcherClassNames } from "../types";
 import type { ViewMode } from "../hooks/useViewMode";
 import { cx } from "./internal";
@@ -54,7 +55,7 @@ export function EntityViewSwitcher({
             type="button"
             className={cx(buttonClass, active && classNames?.activeButton)}
             data-mode={option.mode}
-            data-testid={`view-${option.mode}`}
+            data-testid={generateViewTestId(option.mode)}
             data-active={active || undefined}
             aria-pressed={active}
             onClick={() => onChange(option.mode)}

@@ -1,5 +1,5 @@
+import { generateTestId, resolveLabel } from "@astrapi69/entity-kit-core";
 import type { ActionsClassNames, EntityDescriptor } from "../types";
-import { resolveLabel } from "../labels";
 import type { EntityActionHandler } from "./internal";
 
 export interface EntityActionsProps<T> {
@@ -46,7 +46,11 @@ export function EntityActions<T>({
             className={buttonClass}
             data-action={action.id}
             data-variant={action.variant ?? "default"}
-            data-testid={`${descriptor.entityName}-${descriptor.getId(item)}-${action.id}`}
+            data-testid={generateTestId(
+              descriptor.entityName,
+              descriptor.getId(item),
+              action.id,
+            )}
             onClick={() => onAction?.(action.id, item)}
           >
             {action.icon != null && (

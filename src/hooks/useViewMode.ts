@@ -1,7 +1,8 @@
 import { useCallback, useState } from "react";
+import type { ViewMode } from "@astrapi69/entity-kit-core";
 
-/** The three ways a collection of entities can be presented. */
-export type ViewMode = "list" | "tile" | "detail";
+/** The three ways a collection of entities can be presented (from the core). */
+export type { ViewMode };
 
 export interface UseViewModeResult {
   /** The currently selected view mode. */

@@ -46,6 +46,27 @@ npm install react react-dom @tanstack/react-table
 | `react-dom`             | `^18 \|\| ^19` |
 | `@tanstack/react-table` | `^8`           |
 
+### Packages: `entity-kit` and `entity-kit-core`
+
+All types, utilities (search, sort, `resolveLabel`, `generateTestId`, …), the
+descriptor registry and the CSS design tokens live in
+[`@astrapi69/entity-kit-core`](https://www.npmjs.com/package/@astrapi69/entity-kit-core)
+— a **framework-agnostic** package with zero dependencies. `@astrapi69/entity-kit`
+depends on it and adds the React components.
+
+- You don't install core yourself — it comes in automatically as a dependency.
+- `@astrapi69/entity-kit` **re-exports everything from core**, so existing
+  imports are unchanged: `import { EntityDescriptor, descriptorRegistry } from
+  "@astrapi69/entity-kit"` keeps working. You can equally import those from
+  `@astrapi69/entity-kit-core` directly — both resolve to the same definitions.
+  (In `@astrapi69/entity-kit` the descriptor types are pre-bound to React's
+  `ReactNode` for `icon`/`render`/`thumbnail`; from core you supply the node
+  type yourself, e.g. `EntityDescriptor<Book, ReactNode>`.)
+- `@astrapi69/entity-kit/styles` re-exports the core stylesheet, so theming is
+  unchanged. Apps building a **Vue / Svelte / Angular** binding can depend on
+  `@astrapi69/entity-kit-core` alone for the same descriptors, utilities and
+  tokens — without pulling in React.
+
 ## Quick example
 
 **1. Describe your entity once:**

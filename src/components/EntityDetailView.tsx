@@ -1,5 +1,5 @@
+import { resolveLabel } from "@astrapi69/entity-kit-core";
 import type { DetailClassNames, EntityDescriptor } from "../types";
-import { resolveLabel } from "../labels";
 import { EntityActions } from "./EntityActions";
 import { renderFieldValue, visibleFields } from "./internal";
 import type { EntityActionHandler } from "./internal";

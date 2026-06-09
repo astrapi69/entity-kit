@@ -1,6 +1,28 @@
-import type { ReactNode } from "react";
+// Types now live in @astrapi69/entity-kit-core. This module is a thin shim that
+// re-exports them, binding the framework-agnostic `Node` generic to React's
+// `ReactNode` so descriptors, fields and actions render React content. No types
+// are defined here — only re-exported/aliased from the core.
 
+import type { ReactNode } from "react";
+import type {
+  EntityDescriptor as CoreEntityDescriptor,
+  FieldDescriptor as CoreFieldDescriptor,
+  ActionDescriptor as CoreActionDescriptor,
+} from "@astrapi69/entity-kit-core";
+
+/** React-bound descriptor: renderable nodes (`icon`, `thumbnail`, `render`) are React nodes. */
+export type EntityDescriptor<T> = CoreEntityDescriptor<T, ReactNode>;
+/** React-bound field descriptor: `render` returns a React node. */
+export type FieldDescriptor<T> = CoreFieldDescriptor<T, ReactNode>;
+/** React-bound action descriptor: `icon` is a React node. */
+export type ActionDescriptor<T> = CoreActionDescriptor<T, ReactNode>;
+
+// Framework-agnostic types pass through unchanged from the core.
 export type {
+  ActionVariant,
+  LabelValue,
+  ViewMode,
+  TrashViewOptions,
   ActionsClassNames,
   TileClassNames,
   ListClassNames,
@@ -9,95 +31,4 @@ export type {
   SearchClassNames,
   ViewSwitcherClassNames,
   EmptyStateClassNames,
-} from "./classNames";
-
-/**
- * Visual emphasis for an action. `default` is a neutral action, `danger` marks
- * a destructive action (delete, permanent removal) that consuming apps usually
- * style with a warning color.
- */
-export type ActionVariant = "default" | "danger";
-
-/**
- * Describes a single action that can be performed on an entity item, e.g.
- * "edit", "delete", "restore". The library only renders the action affordance
- * and reports activation back to the host — it never performs the action
- * itself.
- */
-export interface ActionDescriptor<T> {
-  /** Stable identifier, unique within a descriptor's `actions`. */
-  id: string;
-  /**
-   * Human label for the action. Either a string, or a factory `() => string`
-   * for i18n (resolved at render time so it reacts to locale changes).
-   */
-  label: string | (() => string);
-  /** Optional icon (any renderable node, e.g. an SVG or icon component). */
-  icon?: ReactNode;
-  /** Visual emphasis. Defaults to `default` when omitted. */
-  variant?: ActionVariant;
-  /**
-   * Predicate deciding whether the action applies to a given item. When
-   * omitted the action is always available.
-   */
-  isAvailable?: (item: T) => boolean;
-}
-
-/**
- * Describes how a single field of an entity is labelled and rendered. A field
- * always maps to a property key of `T`; an optional custom renderer overrides
- * the default value rendering.
- */
-export interface FieldDescriptor<T> {
-  /** Property key on `T` this field reads from. */
-  key: keyof T;
-  /**
-   * Human label for the field/column header. Either a string, or a factory
-   * `() => string` for i18n (resolved at render time).
-   */
-  label: string | (() => string);
-  /**
-   * Custom renderer for the field value. When omitted, components render the
-   * raw value. Receives the whole item so renderers can combine fields.
-   */
-  render?: (item: T) => ReactNode;
-  /** Whether the field can be sorted on in list views. Defaults to `false`. */
-  sortable?: boolean;
-  /** Whether the field is shown. Defaults to `true` when omitted. */
-  visible?: boolean;
-}
-
-/**
- * The BeanInfo-style self-description of an entity type `T`. A descriptor lets
- * generic components render, sort, search and act on items of `T` without ever
- * knowing the concrete type.
- */
-export interface EntityDescriptor<T> {
-  /** Stable machine name for the entity type, e.g. `"book"`. Used as registry key. */
-  entityName: string;
-  /** Stable, unique identifier for a single item. Used as React key. */
-  getId: (item: T) => string;
-  /** Human/i18n display name for a single item (title shown in tiles, details). */
-  displayName: (item: T) => string;
-  /** Fields shown as columns in list views. */
-  listFields: FieldDescriptor<T>[];
-  /** Whether an item is soft-deleted (drives the trash view). */
-  isDeleted: (item: T) => boolean;
-
-  // --- Optional. Components apply sensible defaults when these are omitted. ---
-
-  /** Short one-line summary of an item. Defaults to `() => ""`. */
-  shortDescription?: (item: T) => string;
-  /** Icon representing the entity type as a whole (renderable node). */
-  icon?: ReactNode;
-  /** Optional per-item thumbnail (image URL or renderable node). */
-  thumbnail?: (item: T) => ReactNode;
-  /** Fields shown as label/value pairs in the detail view. Defaults to `[]`. */
-  detailFields?: FieldDescriptor<T>[];
-  /** Property keys that free-text search matches against. Defaults to `[]`. */
-  searchableFields?: (keyof T)[];
-  /** When the item was soft-deleted, if known. */
-  deletedAt?: (item: T) => Date | string | null | undefined;
-  /** Actions offered for items of this entity type. Defaults to `[]`. */
-  actions?: ActionDescriptor<T>[];
-}
+} from "@astrapi69/entity-kit-core";

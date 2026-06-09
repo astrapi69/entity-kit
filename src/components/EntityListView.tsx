@@ -1,4 +1,5 @@
 import { flexRender } from "@tanstack/react-table";
+import { generateTestId } from "@astrapi69/entity-kit-core";
 import type { EntityDescriptor, ListClassNames } from "../types";
 import { useEntityList, type UseEntityListOptions } from "../hooks/useEntityList";
 import { EntityActions } from "./EntityActions";
@@ -124,7 +125,10 @@ export function EntityListView<T>({
             <tr
               key={row.id}
               className={classNames?.row ?? "entity-list__row"}
-              data-testid={`${descriptor.entityName}-${descriptor.getId(row.original)}`}
+              data-testid={generateTestId(
+                descriptor.entityName,
+                descriptor.getId(row.original),
+              )}
             >
               {row.getVisibleCells().map((cell) => (
                 <td

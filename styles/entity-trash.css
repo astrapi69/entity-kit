@@ -1,13 +1,2 @@
-/*
- * entity-trash — wraps EntityListView for soft-deleted items.
- */
-
-.entity-trash {
-  --entity-list-bg: var(--entity-trash-bg, #fbfbfb);
-  --entity-list-head-bg: var(--entity-trash-head-bg, #f0f0f0);
-  color: var(--entity-trash-color, #555555);
-}
-
-.entity-trash .entity-list__cell {
-  color: var(--entity-trash-cell-color, #777777);
-}
+/* Re-export of the core trash stylesheet. */
+@import "@astrapi69/entity-kit-core/styles/entity-trash.css";

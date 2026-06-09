@@ -1,29 +1,27 @@
 // Public API — named exports only.
+//
+// The framework-agnostic core (types, utilities, registry and design tokens)
+// lives in @astrapi69/entity-kit-core and is re-exported here, so apps can keep
+// importing everything from "@astrapi69/entity-kit". The React components live
+// in this package.
 
-// Core types
+// Re-export the entire core: types, the registry (DescriptorRegistry,
+// descriptorRegistry) and the utilities (resolveLabel, searchEntities,
+// sortEntities, generateTestId, withDescriptorDefaults, …).
+export * from "@astrapi69/entity-kit-core";
+
+// React-bound descriptor types (renderable nodes are React nodes). These
+// explicit exports shadow the core's framework-agnostic versions of the same
+// names, so React consumers get `ReactNode`-typed `icon`/`render`/`thumbnail`.
 export type {
-  ActionVariant,
-  ActionDescriptor,
-  FieldDescriptor,
   EntityDescriptor,
-} from "./types";
-
-// ClassNames interfaces — one per component, for typed `classNames` props.
-export type {
-  ActionsClassNames,
-  TileClassNames,
-  ListClassNames,
-  DetailClassNames,
-  TrashClassNames,
-  SearchClassNames,
-  ViewSwitcherClassNames,
-  EmptyStateClassNames,
+  FieldDescriptor,
+  ActionDescriptor,
 } from "./types";
 
 // Hooks
 export { useViewMode, useEntitySearch, useEntityList } from "./hooks";
 export type {
-  ViewMode,
   UseViewModeResult,
   UseEntityListOptions,
   UseEntityListResult,
@@ -54,6 +52,3 @@ export type {
   EntityViewSwitcherProps,
   ViewSwitcherOption,
 } from "./components";
-
-// Registry
-export { DescriptorRegistry, descriptorRegistry } from "./registry";

@@ -9,8 +9,8 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
+import { resolveLabel, toSearchString } from "@astrapi69/entity-kit-core";
 import type { EntityDescriptor, FieldDescriptor } from "../types";
-import { resolveLabel } from "../labels";
 
 export interface UseEntityListOptions {
   /** Rows per page. Defaults to 10. */
@@ -41,12 +41,6 @@ export interface UseEntityListResult<T> {
 /** Visible fields only — `visible` defaults to true when omitted. */
 function visibleFields<T>(fields: FieldDescriptor<T>[]): FieldDescriptor<T>[] {
   return fields.filter((field) => field.visible !== false);
-}
-
-function toSearchString(value: unknown): string {
-  if (value == null) return "";
-  if (value instanceof Date) return value.toISOString().toLowerCase();
-  return String(value).toLowerCase();
 }
 
 /**
