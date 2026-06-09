@@ -1026,10 +1026,23 @@ label/i18n/styling changes. Ideal for Playwright/Cypress and integration tests:
 
 ### Registry
 
-| Export               | Description                                                                                  |
-| -------------------- | -------------------------------------------------------------------------------------------- |
-| `DescriptorRegistry` | Map-based registry: `register()`, `get<T>()`, `has()`, `list()`, `unregister()`, `clear()`.  |
-| `descriptorRegistry` | A shared default `DescriptorRegistry` instance.                                              |
+Re-exported from `@astrapi69/entity-kit-core` (importable from either package).
+
+| Export               | Description                                                          |
+| -------------------- | ------------------------------------------------------------------- |
+| `DescriptorRegistry` | Map-based registry (methods below).                                 |
+| `descriptorRegistry` | A shared default `DescriptorRegistry` instance.                     |
+
+| Method                 | Behavior                                                          |
+| ---------------------- | ----------------------------------------------------------------- |
+| `register(descriptor)` | Register under `descriptor.entityName`; re-registering overwrites. |
+| `get<T>(name)`         | Return the descriptor, or **throw** if none is registered.        |
+| `tryGet<T>(name)`      | Return the descriptor, or `undefined` if none is registered.      |
+| `has(name)`            | Whether a descriptor is registered under `name`.                  |
+| `list()`               | All registered descriptors, in insertion order.                   |
+| `names()`              | All registered entity names, in insertion order.                  |
+| `unregister(name)`     | Remove one; returns `true` if something was removed.              |
+| `clear()`              | Remove all registered descriptors.                                |
 
 ```tsx
 import { descriptorRegistry } from "@astrapi69/entity-kit";
@@ -1037,8 +1050,26 @@ import { descriptorRegistry } from "@astrapi69/entity-kit";
 descriptorRegistry.register(bookDescriptor);
 descriptorRegistry.register(profileDescriptor);
 
-const desc = descriptorRegistry.get<Book>("book");
+const book = descriptorRegistry.get<Book>("book");     // throws if "book" is unknown
+const maybe = descriptorRegistry.tryGet<Book>("book"); // undefined if unknown
 ```
+
+> **Changed in 0.3.0.** `get()` now **throws** on an unknown name (it returned
+> `undefined` in ≤ 0.2.x). Use `tryGet()` for the `undefined`-returning lookup.
+
+## Migrating to 0.3.0
+
+0.3.0 moves all types, utilities, the registry and the design tokens into the
+new framework-agnostic [`@astrapi69/entity-kit-core`](#packages-entity-kit-and-entity-kit-core)
+package; `@astrapi69/entity-kit` re-exports them and keeps the React components.
+**It installs automatically and existing imports are unchanged** — including
+`@astrapi69/entity-kit/styles`.
+
+One behavioral change to be aware of:
+
+- **`descriptorRegistry.get()` now throws** on an unknown name instead of
+  returning `undefined`. If you relied on the old behavior, switch to the new
+  **`tryGet()`** (see [Registry](#registry)).
 
 ## Migrating from 0.1.x
 
